@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VirtuCasa – Visita, diseña y vive tu hogar</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue-deep:#0A1628;--blue-mid:#1B3A6B;--blue-brand:#1E5FD4;--blue-light:#4A90E2;
+  --green:#22C55E;--green-dark:#16A34A;--white:#FFFFFF;
+  --gray-50:#F8FAFC;--gray-100:#F1F5F9;--gray-200:#E2E8F0;--gray-300:#CBD5E1;
+  --gray-400:#94A3B8;--gray-500:#64748B;--gray-600:#475569;--gray-700:#334155;--gray-800:#1E293B;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 16px rgba(0,0,0,.10);--shadow-lg:0 10px 40px rgba(0,0,0,.14);
+  --r-sm:10px;--r-md:16px;--r-lg:24px;--r-xl:32px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh;overflow-x:hidden}
+.app-shell{max-width:430px;margin:0 auto;min-height:100vh;background:var(--white);position:relative;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.15)}
+.screen{display:none;min-height:100vh;flex-direction:column;animation:fadeIn .3s ease}
+.screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+
+/* Bottom Nav */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--white);border-top:1px solid var(--gray-100);display:flex;z-index:100;padding:8px 0 16px;box-shadow:0 -4px 20px rgba(0,0,0,.06)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px 4px;transition:all .2s}
+.nav-icon{font-size:20px;transition:transform .2s}
+.nav-label{font-size:10px;font-weight:600;color:var(--gray-400);letter-spacing:.3px}
+.nav-item.active .nav-label{color:var(--blue-brand)}
+.nav-item.active .nav-icon{transform:scale(1.1)}
+
+/* Top Bar */
+.top-bar{background:white;padding:52px 20px 16px;border-bottom:1px solid var(--gray-100);position:sticky;top:0;z-index:50}
+.top-bar-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.screen-title{font-family:'Syne',sans-serif;font-weight:700;font-size:22px;color:var(--gray-800)}
+.icon-btn{width:40px;height:40px;border-radius:12px;background:var(--gray-100);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px}
+.search-bar{display:flex;align-items:center;gap:10px;background:var(--gray-100);border-radius:12px;padding:11px 14px}
+.search-bar input{flex:1;border:none;background:transparent;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;color:var(--gray-700);outline:none}
+.search-bar input::placeholder{color:var(--gray-400)}
+
+/* Scroll */
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scroll-area::-webkit-scrollbar{display:none}
+
+/* Buttons */
+.btn-primary{background:var(--green);color:white;border:none;border-radius:var(--r-md);padding:16px 24px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.2px;width:100%}
+.btn-primary:hover{background:var(--green-dark);transform:translateY(-1px)}
+.btn-secondary{background:rgba(255,255,255,.1);color:white;border:1px solid rgba(255,255,255,.25);border-radius:var(--r-md);padding:14px 24px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;margin-top:12px;width:100%}
+.btn-cta-green{background:var(--green);color:white;border:none;border-radius:var(--r-md);padding:15px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;width:100%}
+.btn-cta-blue{background:var(--blue-brand);color:white;border:none;border-radius:var(--r-md);padding:15px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;width:100%}
+.btn-cta-outline{background:white;color:var(--gray-700);border:1.5px solid var(--gray-200);border-radius:var(--r-md);padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;width:100%}
+
+/* ── SCREEN 1: HOME ── */
+#screen-home{background:linear-gradient(160deg,var(--blue-deep) 0%,#0D2447 60%,#152E60 100%);padding-bottom:0}
+.onboarding-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.orb{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(30,95,212,.35) 0%,transparent 70%);animation:pulse 4s ease-in-out infinite}
+.orb-1{width:300px;height:300px;top:-80px;right:-80px}
+.orb-2{width:200px;height:200px;bottom:200px;left:-60px;animation-delay:2s}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.1);opacity:1}}
+.home-content{position:relative;z-index:1;display:flex;flex-direction:column;padding:60px 28px 32px;min-height:100vh}
+.logo-badge{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.2);border-radius:50px;padding:8px 18px 8px 8px;margin-bottom:48px;width:fit-content}
+.logo-icon{width:36px;height:36px;background:var(--blue-brand);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-text{font-family:'Syne',sans-serif;font-weight:700;color:white;font-size:16px}
+.hero-tagline{font-family:'Syne',sans-serif;font-weight:800;font-size:36px;line-height:1.15;color:white;margin-bottom:16px}
+.hero-tagline span{color:#5AAEFF}
+.hero-sub{color:rgba(255,255,255,.65);font-size:14px;line-height:1.7;margin-bottom:40px}
+.features-mini{display:flex;flex-direction:column;gap:12px;margin-bottom:48px}
+.feat-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.07);border-radius:12px;padding:12px 16px}
+.feat-icon{font-size:20px;flex-shrink:0}
+.feat-text{color:rgba(255,255,255,.8);font-size:13px;font-weight:500}
+
+/* ── SCREEN 2: EXPLORE ── */
+#screen-explore{background:var(--gray-50);padding-bottom:90px}
+.filters-scroll{display:flex;gap:8px;padding:12px 20px;overflow-x:auto;scrollbar-width:none}
+.filters-scroll::-webkit-scrollbar{display:none}
+.filter-chip{flex-shrink:0;padding:7px 14px;border-radius:50px;border:1.5px solid var(--gray-200);background:white;font-size:12px;font-weight:600;color:var(--gray-600);cursor:pointer;transition:all .2s;white-space:nowrap}
+.filter-chip.active,.filter-chip:hover{border-color:var(--blue-brand);color:var(--blue-brand);background:#EEF3FD}
+.section-label{font-size:13px;font-weight:700;color:var(--gray-500);letter-spacing:.8px;text-transform:uppercase;padding:16px 20px 8px}
+.properties-grid{padding:0 20px;display:flex;flex-direction:column;gap:16px}
+.property-card{background:white;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s;cursor:pointer}
+.property-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.card-img-placeholder{width:100%;height:200px;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative}
+.card-badge{position:absolute;top:12px;left:12px;background:var(--blue-brand);color:white;font-size:10px;font-weight:700;letter-spacing:.5px;padding:4px 10px;border-radius:50px}
+.card-badge.arriendo{background:#7C3AED}
+.card-fav{position:absolute;top:12px;right:12px;width:32px;height:32px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-sm);font-size:14px;transition:transform .2s;border:none}
+.card-ar-badge{position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);color:white;font-size:10px;font-weight:700;padding:4px 10px;border-radius:50px;display:flex;align-items:center;gap:4px}
+.card-body{padding:16px}
+.card-price{font-family:'Syne',sans-serif;font-weight:700;font-size:20px;color:var(--gray-800);margin-bottom:4px}
+.card-location{font-size:12px;color:var(--gray-500);margin-bottom:12px;display:flex;align-items:center;gap:4px}
+.card-stats{display:flex;gap:16px;margin-bottom:14px}
+.stat{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gray-600);font-weight:500}
+.card-actions{display:flex;gap:8px}
+.btn-detail{flex:1;padding:10px;border-radius:var(--r-sm);background:var(--gray-100);border:none;cursor:pointer;font-size:12px;font-weight:700;color:var(--gray-700);font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s}
+.btn-ar-card{flex:1;padding:10px;border-radius:var(--r-sm);background:var(--blue-brand);border:none;cursor:pointer;font-size:12px;font-weight:700;color:white;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px}
+
+/* ── SCREEN 3: DETAIL ── */
+#screen-detail{background:white;padding-bottom:90px}
+.detail-hero{width:100%;height:280px;display:flex;align-items:center;justify-content:center;font-size:72px;position:relative}
+.detail-back{position:absolute;top:50px;left:16px;z-index:10;width:40px;height:40px;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;border:none;box-shadow:var(--shadow-sm)}
+.gallery-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px}
+.gallery-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5)}
+.gallery-dot.active{width:20px;border-radius:3px;background:white}
+.detail-body{padding:24px 20px}
+.detail-price{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;color:var(--gray-800);margin-bottom:6px}
+.detail-location{font-size:14px;color:var(--gray-500);margin-bottom:20px;display:flex;align-items:center;gap:5px}
+.detail-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.detail-stat{background:var(--gray-50);border-radius:var(--r-sm);padding:12px 8px;text-align:center}
+.detail-stat .val{font-size:16px;font-weight:700;color:var(--gray-800);display:block}
+.detail-stat .key{font-size:10px;color:var(--gray-500);margin-top:2px}
+.section-heading{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--gray-800);margin-bottom:12px}
+.detail-desc{font-size:13px;line-height:1.8;color:var(--gray-600);margin-bottom:24px}
+.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:24px}
+.feature-tag{display:flex;align-items:center;gap:8px;background:var(--gray-50);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;font-weight:600;color:var(--gray-700)}
+.detail-cta-stack{display:flex;flex-direction:column;gap:10px}
+
+/* ── SCREEN 4: AR TOUR (ENHANCED) ── */
+#screen-ar{background:#060614;color:white;padding-bottom:0;position:relative}
+.ar-shell{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* AR Viewport */
+.ar-viewport{flex:1;position:relative;overflow:hidden;min-height:0}
+.ar-scene{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:background .6s ease}
+
+/* Perspective room */
+.ar-room-3d{position:absolute;inset:0;perspective:600px;display:flex;align-items:center;justify-content:center}
+.ar-room-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.25,.46,.45,.94)}
+
+/* Room surfaces */
+.room-surface{position:absolute;backface-visibility:hidden}
+.room-floor{bottom:0;left:0;right:0;height:45%;transform:rotateX(55deg);transform-origin:bottom center}
+.room-back-wall{top:0;left:0;right:0;height:60%;display:flex;align-items:center;justify-content:center}
+.room-left-wall{top:0;left:0;width:30%;height:100%;transform:skewY(-20deg);transform-origin:top left;opacity:.7}
+.room-right-wall{top:0;right:0;width:30%;height:100%;transform:skewY(20deg);transform-origin:top right;opacity:.7}
+
+/* Scan overlay */
+.ar-scan-lines{position:absolute;inset:0;pointer-events:none;opacity:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(30,95,212,.04) 3px,rgba(30,95,212,.04) 6px);transition:opacity .5s}
+.ar-scan-lines.active{opacity:1}
+.ar-vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.5) 100%)}
+.ar-grid{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .5s;background-image:linear-gradient(rgba(30,95,212,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(30,95,212,.15) 1px,transparent 1px);background-size:40px 40px}
+.ar-grid.active{opacity:1}
+
+/* AR Corners */
+.ar-corner{position:absolute;width:28px;height:28px;border-color:#00FF88;border-style:solid;opacity:0;transition:opacity .5s}
+.ar-corner.active{opacity:1}
+.ar-corner.tl{top:16px;left:16px;border-width:3px 0 0 3px}
+.ar-corner.tr{top:16px;right:16px;border-width:3px 3px 0 0}
+.ar-corner.bl{bottom:16px;left:16px;border-width:0 0 3px 3px}
+.ar-corner.br{bottom:16px;right:16px;border-width:0 3px 3px 0}
+
+/* AR Top HUD */
+.ar-hud-top{position:absolute;top:0;left:0;right:0;padding:48px 14px 12px;display:flex;align-items:center;justify-content:space-between;z-index:20;background:linear-gradient(to bottom,rgba(0,0,0,.6) 0%,transparent 100%)}
+.ar-back-btn{width:40px;height:40px;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;border:1px solid rgba(255,255,255,.2);color:white}
+.ar-status{display:flex;flex-direction:column;align-items:center;gap:4px}
+.ar-mode-badge{background:rgba(30,95,212,.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);color:white;font-size:10px;font-weight:700;padding:5px 14px;border-radius:50px;display:flex;align-items:center;gap:6px}
+.ar-mode-badge.ar-active{background:rgba(34,197,94,.85)}
+.ar-dot{width:6px;height:6px;background:#00FF88;border-radius:50%;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.ar-compass{font-size:11px;color:rgba(255,255,255,.6);letter-spacing:1px}
+.ar-hud-btns{display:flex;gap:6px}
+.ar-hud-btn{width:36px;height:36px;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;border:1px solid rgba(255,255,255,.2)}
+
+/* AR Property info strip */
+.ar-prop-info{position:absolute;top:105px;left:14px;right:14px;background:rgba(0,0,0,.5);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 14px;z-index:15;display:flex;align-items:center;justify-content:space-between}
+.ar-prop-name{font-size:12px;font-weight:700;color:white}
+.ar-prop-loc{font-size:10px;color:rgba(255,255,255,.6);margin-top:2px}
+.ar-prop-area{font-size:11px;color:#5AAEFF;font-weight:700}
+
+/* Room emoji display */
+.ar-room-emoji{font-size:80px;z-index:2;position:relative;text-shadow:0 8px 32px rgba(0,0,0,.5);transition:all .4s;user-select:none}
+.ar-depth-left{position:absolute;left:8%;top:20%;font-size:40px;opacity:.3;filter:blur(2px);transition:all .4s}
+.ar-depth-right{position:absolute;right:8%;top:25%;font-size:32px;opacity:.2;filter:blur(3px);transition:all .4s}
+.ar-floor-reflect{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);font-size:60px;opacity:.1;filter:blur(4px) scaleY(-1)}
+
+/* Hotspots */
+.ar-hotspot{position:absolute;cursor:pointer;z-index:25;display:flex;flex-direction:column;align-items:center}
+.hs-circle{width:32px;height:32px;border-radius:50%;background:rgba(30,95,212,.9);backdrop-filter:blur(4px);border:2px solid rgba(255,255,255,.6);display:flex;align-items:center;justify-content:center;font-size:12px;color:white;font-weight:700;animation:hsRipple 2.5s infinite}
+@keyframes hsRipple{0%{box-shadow:0 0 0 0 rgba(30,95,212,.5)}70%{box-shadow:0 0 0 14px rgba(30,95,212,0)}100%{box-shadow:0 0 0 0 rgba(30,95,212,0)}}
+.hs-label{background:rgba(0,0,0,.8);backdrop-filter:blur(6px);color:white;font-size:9px;font-weight:700;padding:4px 10px;border-radius:8px;margin-top:6px;white-space:nowrap;max-width:100px;text-align:center;border:1px solid rgba(255,255,255,.1)}
+
+/* AR Info Panel (expandable) */
+.ar-info-panel{position:absolute;left:14px;right:14px;bottom:220px;background:rgba(10,22,40,.9);backdrop-filter:blur(12px);border:1px solid rgba(30,95,212,.4);border-radius:16px;padding:14px;z-index:30;transform:translateY(120%);transition:transform .4s cubic-bezier(.25,.46,.45,.94);display:none}
+.ar-info-panel.open{transform:translateY(0);display:block}
+.ar-info-close{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.1);border:none;color:white;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:12px}
+.ar-info-title{font-size:13px;font-weight:700;color:#5AAEFF;margin-bottom:8px}
+.ar-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ar-info-item .ai-label{font-size:9px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px}
+.ar-info-item .ai-val{font-size:12px;color:white;font-weight:600;margin-top:2px}
+
+/* AR Nav Controls */
+.ar-nav-zone{position:absolute;bottom:130px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:20}
+.ar-nav-row{display:flex;gap:12px;align-items:center;justify-content:center}
+.ar-nav-btn{width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;transition:all .15s;color:white;user-select:none}
+.ar-nav-btn:active{background:rgba(255,255,255,.25);transform:scale(.92)}
+.ar-nav-center{width:64px;height:64px;border-radius:50%;background:rgba(30,95,212,.7);backdrop-filter:blur(8px);border:2px solid rgba(255,255,255,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:white;font-weight:700}
+.ar-nav-up{width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:22px;color:white}
+.ar-step-counter{font-size:11px;color:rgba(255,255,255,.5);text-align:center;margin-top:2px}
+
+/* Room tabs */
+.ar-rooms-scroll{position:absolute;bottom:80px;left:0;right:0;display:flex;gap:8px;padding:0 14px;overflow-x:auto;scrollbar-width:none;z-index:20}
+.ar-rooms-scroll::-webkit-scrollbar{display:none}
+.ar-room-tab{flex-shrink:0;padding:7px 16px;border-radius:50px;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18);color:white;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap}
+.ar-room-tab.active{background:var(--blue-brand);border-color:var(--blue-brand)}
+
+/* AR Bottom controls */
+.ar-bottom-panel{background:#0D0D1A;padding:10px 14px 22px;border-top:1px solid rgba(255,255,255,.08);z-index:20}
+.ar-bottom-row{display:flex;gap:8px;margin-bottom:10px}
+.btn-ar-activate{flex:1;padding:13px;border-radius:var(--r-md);border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;background:linear-gradient(135deg,var(--blue-brand),#7C3AED);color:white;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s}
+.btn-ar-decor{padding:13px 16px;border-radius:var(--r-md);border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;background:rgba(34,197,94,.2);border:1px solid rgba(34,197,94,.4);color:#22C55E;display:flex;align-items:center;justify-content:center;gap:6px}
+.ar-demo-note{text-align:center;font-size:10px;color:rgba(255,255,255,.35)}
+
+/* Movement feedback */
+.ar-move-flash{position:absolute;inset:0;background:rgba(30,95,212,.08);opacity:0;pointer-events:none;z-index:50;transition:opacity .15s}
+.ar-move-flash.flash{opacity:1}
+
+/* ── SCREEN 5: DECORATION (ENHANCED) ── */
+#screen-decor{background:var(--gray-50);padding-bottom:90px}
+
+/* Room canvas with perspective */
+.decor-canvas{position:relative;height:280px;overflow:hidden;background:linear-gradient(180deg,#F0EBE3 0%,#E8E2DA 55%,#C8B89A 55%,#B5A080 100%)}
+.dc-wall{position:absolute;top:0;left:0;right:0;height:57%}
+.dc-floor{position:absolute;bottom:0;left:0;right:0;height:43%}
+.dc-ceiling-line{position:absolute;top:57%;left:0;right:0;height:2px;background:#A08060;opacity:.5}
+.dc-window{position:absolute;top:30px;right:50px;width:70px;height:88px;background:linear-gradient(180deg,#87CEEB,#B0E0FF);border:3px solid #8B7355;border-radius:3px}
+.dc-window-cross{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;height:2px;background:#8B7355}
+.dc-window-cross2{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:2px;height:100%;background:#8B7355}
+.dc-baseboard{position:absolute;bottom:42%;left:0;right:0;height:4px;background:#A08060}
+.dc-skirting{position:absolute;bottom:41%;left:0;right:0;height:6px;background:#B0906A;opacity:.6}
+
+/* Placed furniture area */
+.dc-furniture-layer{position:absolute;bottom:43%;left:0;right:0;display:flex;align-items:flex-end;justify-content:center;gap:6px;padding:0 20px;z-index:5}
+.dc-item{position:relative;display:flex;flex-direction:column;align-items:center;cursor:pointer;animation:popIn .3s cubic-bezier(.34,1.56,.64,1);flex-shrink:0}
+@keyframes popIn{from{transform:scale(0) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.dc-item-emoji{line-height:1;display:block;transition:transform .2s;filter:drop-shadow(0 6px 8px rgba(0,0,0,.2))}
+.dc-item.selected .dc-item-emoji{transform:scale(1.1)}
+.dc-item-shadow{width:60%;height:6px;background:rgba(0,0,0,.15);border-radius:50%;margin-top:2px;filter:blur(2px)}
+.dc-item-controls{position:absolute;top:-32px;left:50%;transform:translateX(-50%);background:white;border-radius:20px;padding:3px 8px;display:none;gap:8px;box-shadow:var(--shadow-md);white-space:nowrap;z-index:10;border:1px solid var(--gray-200)}
+.dc-item.selected .dc-item-controls{display:flex}
+.dc-ctrl-btn{background:none;border:none;cursor:pointer;font-size:13px;padding:2px}
+
+/* Room selector in decor */
+.decor-room-selector{display:flex;gap:6px;padding:10px 14px;background:white;border-bottom:1px solid var(--gray-100);overflow-x:auto;scrollbar-width:none}
+.decor-room-selector::-webkit-scrollbar{display:none}
+.drs-tab{flex-shrink:0;padding:6px 14px;border-radius:50px;border:1.5px solid var(--gray-200);background:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:var(--gray-600);transition:all .2s}
+.drs-tab.active{border-color:var(--blue-brand);color:var(--blue-brand);background:#EEF3FD}
+
+/* Style controls */
+.decor-controls{padding:14px 16px;background:white;border-bottom:1px solid var(--gray-100)}
+.ctrl-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ctrl-label{font-size:11px;font-weight:700;color:var(--gray-500);min-width:52px;letter-spacing:.3px}
+.style-tabs{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto}
+.style-tab{flex-shrink:0;padding:6px 12px;border-radius:var(--r-sm);border:1.5px solid var(--gray-200);background:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:var(--gray-600);transition:all .2s}
+.style-tab.active{border-color:var(--blue-brand);color:var(--blue-brand);background:#EEF3FD}
+.color-swatches{display:flex;gap:8px;align-items:center}
+.cs-swatch{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2.5px solid transparent;transition:all .2s}
+.cs-swatch.active{border-color:var(--gray-800);transform:scale(1.2)}
+
+/* Catalog */
+.furniture-catalog{padding:12px 16px}
+.cat-scroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px}
+.cat-scroll::-webkit-scrollbar{display:none}
+.cat-pill{flex-shrink:0;padding:6px 14px;border-radius:50px;border:1.5px solid var(--gray-200);background:white;font-size:11px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:var(--gray-600);transition:all .2s}
+.cat-pill.active{border-color:var(--blue-brand);color:var(--blue-brand);background:#EEF3FD}
+.furniture-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.fc-card{background:white;border-radius:10px;border:1.5px solid var(--gray-100);padding:10px 6px 8px;text-align:center;cursor:pointer;transition:all .2s}
+.fc-card:hover{border-color:var(--blue-brand);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.fc-card:active{transform:scale(.95)}
+.fc-emoji{font-size:28px;display:block;margin-bottom:4px}
+.fc-name{font-size:9px;font-weight:600;color:var(--gray-600);line-height:1.2}
+.fc-add{font-size:9px;font-weight:700;color:var(--blue-brand);margin-top:3px}
+
+/* Design summary */
+.design-summary{margin:0 16px 12px;background:var(--gray-50);border-radius:var(--r-md);padding:14px;border:1px solid var(--gray-200)}
+.ds-title{font-size:11px;font-weight:700;color:var(--gray-500);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.ds-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.ds-label{color:var(--gray-500);font-weight:600}
+.ds-val{color:var(--gray-800);font-weight:700}
+.ds-items{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.ds-tag{background:var(--blue-brand);color:white;font-size:9px;font-weight:700;padding:3px 10px;border-radius:50px}
+.btn-save-design{margin:0 16px;width:calc(100% - 32px);background:var(--green);color:white;border:none;border-radius:var(--r-md);padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* ── SCREENS 6-9 (same as v1) ── */
+#screen-favs{background:var(--gray-50);padding-bottom:90px}
+.favs-list{padding:0 20px;display:flex;flex-direction:column;gap:12px}
+.fav-card{background:white;border-radius:var(--r-md);display:flex;gap:12px;padding:12px;box-shadow:var(--shadow-sm);cursor:pointer}
+.fav-img{width:80px;height:80px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0}
+.fav-info{flex:1}
+.fav-price{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--gray-800)}
+.fav-loc{font-size:11px;color:var(--gray-500);margin-bottom:6px}
+.fav-stats{display:flex;gap:10px}
+.fav-stat{font-size:11px;color:var(--gray-600);display:flex;align-items:center;gap:3px}
+.fav-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.btn-rm-fav{width:28px;height:28px;border-radius:8px;background:#FEF2F2;border:none;cursor:pointer;font-size:12px;color:#EF4444}
+.ar-indicator{background:#EEF3FD;color:var(--blue-brand);font-size:9px;font-weight:700;padding:3px 8px;border-radius:50px}
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px;text-align:center}
+.empty-icon{font-size:64px;margin-bottom:16px}
+.empty-title{font-family:'Syne',sans-serif;font-weight:700;font-size:20px;color:var(--gray-700);margin-bottom:8px}
+.empty-sub{font-size:13px;color:var(--gray-400);line-height:1.6}
+.compare-bar{padding:12px 20px;background:white;border-top:1px solid var(--gray-100);margin-top:8px}
+.btn-compare{width:100%;padding:13px;border-radius:var(--r-md);background:var(--blue-brand);color:white;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+
+#screen-schedule{background:var(--gray-50);padding-bottom:90px}
+.form-card{margin:16px 20px;background:white;border-radius:var(--r-lg);padding:24px 20px;box-shadow:var(--shadow-sm)}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:700;color:var(--gray-600);margin-bottom:6px;letter-spacing:.3px}
+.form-input{width:100%;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--gray-200);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;color:var(--gray-700);outline:none;transition:border-color .2s;background:var(--gray-50)}
+.form-input:focus{border-color:var(--blue-brand);background:white}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.visit-types{display:flex;gap:8px}
+.visit-type{flex:1;padding:12px;border-radius:var(--r-sm);border:1.5px solid var(--gray-200);background:white;cursor:pointer;text-align:center;transition:all .2s}
+.visit-type.active{border-color:var(--blue-brand);background:#EEF3FD}
+.vt-icon{font-size:20px;display:block;margin-bottom:4px}
+.vt-label{font-size:12px;font-weight:700;color:var(--gray-600)}
+.visit-type.active .vt-label{color:var(--blue-brand)}
+.confirm-msg{margin:0 20px;padding:20px;border-radius:var(--r-md);background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1px solid #BBF7D0;display:none;text-align:center}
+.confirm-msg.show{display:block}
+
+#screen-admin{background:var(--gray-50);padding-bottom:90px}
+.metrics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:16px 20px}
+.metric-card{background:white;border-radius:var(--r-md);padding:16px;box-shadow:var(--shadow-sm)}
+.metric-val{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:var(--gray-800);margin-bottom:2px}
+.metric-label{font-size:11px;color:var(--gray-500);font-weight:600}
+.metric-trend{font-size:11px;color:var(--green-dark);font-weight:700;margin-top:4px}
+.admin-section{padding:0 20px 16px}
+.admin-prop-row{background:white;border-radius:var(--r-md);padding:14px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-sm);margin-bottom:10px}
+.admin-prop-img{width:60px;height:60px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.admin-prop-title{font-size:13px;font-weight:700;color:var(--gray-800);margin-bottom:2px}
+.admin-prop-price{font-size:12px;color:var(--gray-500)}
+.admin-prop-status{font-size:10px;font-weight:700;padding:3px 10px;border-radius:50px}
+.status-active{background:#DCFCE7;color:#166534}
+.status-pending{background:#FEF3C7;color:#92400E}
+.btn-add-prop{width:calc(100% - 40px);margin:0 20px 16px;background:var(--blue-brand);color:white;border:none;border-radius:var(--r-md);padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+.add-prop-form{margin:0 20px;display:none;background:white;border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-md);margin-bottom:16px}
+.add-prop-form.open{display:block}
+
+#screen-profile{background:var(--gray-50);padding-bottom:90px}
+.profile-hero{background:linear-gradient(135deg,var(--blue-deep) 0%,var(--blue-mid) 100%);padding:52px 20px 32px;text-align:center}
+.profile-avatar{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.15);border:3px solid rgba(255,255,255,.3);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:32px}
+.profile-name{font-family:'Syne',sans-serif;font-weight:700;font-size:20px;color:white;margin-bottom:4px}
+.plan-cards{padding:20px 20px 0;display:flex;flex-direction:column;gap:14px}
+.plan-card{background:white;border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-sm);border:2px solid transparent}
+.plan-card.premium{border-color:var(--blue-brand);position:relative;overflow:hidden}
+.plan-card.premium::before{content:'RECOMENDADO';position:absolute;top:14px;right:-12px;background:var(--blue-brand);color:white;font-size:9px;font-weight:800;padding:3px 20px;transform:rotate(12deg);letter-spacing:.5px}
+.plan-name{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:var(--gray-800);margin-bottom:4px}
+.plan-price{font-size:28px;font-weight:800;color:var(--gray-800)}
+.plan-features{margin:14px 0;display:flex;flex-direction:column;gap:8px}
+.plan-feature{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gray-700)}
+.btn-upgrade{width:100%;padding:14px;border-radius:var(--r-md);background:linear-gradient(135deg,var(--blue-brand),#7C3AED);color:white;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+.profile-menu{padding:16px 20px}
+.profile-menu-item{display:flex;align-items:center;gap:12px;background:white;border-radius:var(--r-md);padding:14px;margin-bottom:8px;cursor:pointer;box-shadow:var(--shadow-sm);transition:all .2s}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;max-width:430px;left:50%;transform:translateX(-50%)}
+.modal-overlay.open{display:flex}
+.modal-sheet{background:white;border-radius:var(--r-xl) var(--r-xl) 0 0;width:100%;max-height:85vh;overflow-y:auto;padding:24px 20px 40px;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--gray-200);border-radius:2px;margin:0 auto 20px}
+.compare-table{width:100%;border-collapse:collapse}
+.compare-table th{text-align:left;font-size:11px;font-weight:700;color:var(--gray-400);text-transform:uppercase;padding:8px 0;letter-spacing:.5px}
+.compare-table td{font-size:13px;padding:10px 0;border-bottom:1px solid var(--gray-100);color:var(--gray-700)}
+.compare-table td:not(:first-child){text-align:center;font-weight:600}
+.compare-table th:not(:first-child){text-align:center}
+
+/* Toast */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gray-800);color:white;font-size:13px;font-weight:600;padding:10px 20px;border-radius:50px;z-index:999;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;max-width:380px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Gradients */
+.bg-apt1{background:linear-gradient(135deg,#667eea,#764ba2)}
+.bg-apt2{background:linear-gradient(135deg,#f093fb,#f5576c)}
+.bg-apt3{background:linear-gradient(135deg,#4facfe,#00f2fe)}
+.bg-house{background:linear-gradient(135deg,#43e97b,#38f9d7)}
+.bg-studio{background:linear-gradient(135deg,#fa709a,#fee140)}
+.bg-modern{background:linear-gradient(135deg,#30cfd0,#330867)}
+
+.mt-16{margin-top:16px}
+
+
+/* ── STREET VIEW AR FIX: cámara 360 simulada y recorrido real ── */
+.streetview-scene{background:#07111f;cursor:grab;touch-action:none;overflow:hidden;perspective:900px;user-select:none}
+.streetview-scene.dragging{cursor:grabbing}
+.sv-panorama{position:absolute;inset:0;overflow:hidden;background:#07111f;transform-style:preserve-3d}
+.sv-loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.72);font-size:13px;font-weight:700;background:linear-gradient(135deg,#101d33,#07111f)}
+.sv-track{position:absolute;inset:0 auto 0 0;width:400%;height:100%;display:flex;will-change:transform;transition:transform .18s ease-out;transform-origin:center center}
+.streetview-scene.dragging .sv-track{transition:none}
+.sv-panel{position:relative;flex:0 0 25%;height:100%;overflow:hidden;background:var(--sv-wall,#e7edf5)}
+.sv-panel::before{content:"";position:absolute;left:0;right:0;top:0;height:18%;background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.12));opacity:.75}
+.sv-wall{position:absolute;left:0;right:0;top:0;height:62%;background:linear-gradient(180deg,var(--sv-wall,#e7edf5) 0%,var(--sv-wall2,#d8e0ec) 100%);border-bottom:5px solid rgba(100,116,139,.25);display:flex;align-items:center;justify-content:center;transform:translateY(var(--sv-pitch,0px))}
+.sv-floor{position:absolute;left:0;right:0;bottom:0;height:43%;background:radial-gradient(ellipse at center top,rgba(255,255,255,.42),transparent 35%),linear-gradient(90deg,rgba(255,255,255,.12) 0 1px,transparent 1px),linear-gradient(0deg,rgba(0,0,0,.12) 0 1px,transparent 1px),linear-gradient(180deg,var(--sv-floor,#bfa987),var(--sv-floor2,#91775a));background-size:auto,56px 56px,56px 56px,auto;transform-origin:center top;transform:perspective(600px) rotateX(58deg) scaleY(1.9) translateY(calc(var(--sv-pitch,0px) * .45));opacity:.96}
+.sv-backlight{position:absolute;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.5),transparent 70%);top:8%;left:50%;transform:translateX(-50%);opacity:.28;filter:blur(3px)}
+.sv-focal{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);font-size:74px;text-shadow:0 12px 30px rgba(0,0,0,.25);filter:drop-shadow(0 14px 18px rgba(0,0,0,.24));z-index:4}
+.sv-side-object{position:absolute;top:44%;font-size:44px;opacity:.86;filter:drop-shadow(0 10px 12px rgba(0,0,0,.22));z-index:4}
+.sv-side-object.left{left:14%}.sv-side-object.right{right:14%}
+.sv-window{position:absolute;top:24%;right:11%;width:96px;height:84px;border:6px solid rgba(71,85,105,.65);border-radius:9px;background:linear-gradient(180deg,#9bd7ff,#e0f2fe);box-shadow:0 12px 22px rgba(15,23,42,.14);z-index:3}
+.sv-window::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:3px;background:rgba(71,85,105,.5);transform:translateX(-50%)}
+.sv-window::after{content:"";position:absolute;left:0;right:0;top:50%;height:3px;background:rgba(71,85,105,.5);transform:translateY(-50%)}
+.sv-door{position:absolute;left:11%;bottom:38%;width:74px;height:130px;border-radius:10px 10px 0 0;background:linear-gradient(180deg,#8b5e34,#5c3b21);box-shadow:inset -12px 0 18px rgba(0,0,0,.15),0 14px 24px rgba(15,23,42,.2);z-index:3}
+.sv-door::after{content:"";position:absolute;right:11px;top:58px;width:9px;height:9px;border-radius:50%;background:#facc15}
+.sv-rug{position:absolute;left:50%;bottom:14%;width:190px;height:54px;border-radius:50%;background:radial-gradient(ellipse at center,var(--sv-accent,#2563eb),rgba(30,95,212,.35) 58%,transparent 72%);transform:translateX(-50%);opacity:.62;filter:blur(.2px);z-index:2}
+.sv-art{position:absolute;top:22%;left:15%;width:78px;height:58px;border-radius:7px;background:linear-gradient(135deg,var(--sv-accent,#2563eb),rgba(255,255,255,.42));box-shadow:0 10px 20px rgba(15,23,42,.14);border:5px solid rgba(255,255,255,.52);z-index:3}
+.sv-label-wall{position:absolute;left:50%;bottom:48%;transform:translateX(-50%);background:rgba(15,23,42,.54);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18);color:white;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:6px 12px;border-radius:999px;z-index:5}
+.sv-depth-lines{position:absolute;inset:auto 0 40% 0;height:26%;background:repeating-linear-gradient(90deg,transparent 0 64px,rgba(255,255,255,.09) 64px 66px);opacity:.45;pointer-events:none;z-index:1}
+.sv-center-reticle{position:absolute;left:50%;top:50%;width:42px;height:42px;transform:translate(-50%,-50%);border:1.5px solid rgba(255,255,255,.5);border-radius:50%;z-index:14;pointer-events:none;box-shadow:0 0 18px rgba(30,95,212,.28)}
+.sv-center-reticle::before,.sv-center-reticle::after{content:"";position:absolute;background:rgba(255,255,255,.55)}
+.sv-center-reticle::before{left:50%;top:8px;bottom:8px;width:1px;transform:translateX(-50%)}
+.sv-center-reticle::after{top:50%;left:8px;right:8px;height:1px;transform:translateY(-50%)}
+.sv-center-reticle span{position:absolute;left:50%;top:50%;width:5px;height:5px;border-radius:50%;background:#22C55E;transform:translate(-50%,-50%);box-shadow:0 0 12px #22C55E}
+.sv-room-pill{position:absolute;left:50%;top:146px;transform:translateX(-50%);background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(10px);color:white;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:7px 14px;border-radius:999px;z-index:16;white-space:nowrap}
+.sv-drag-hint{position:absolute;left:50%;bottom:306px;transform:translateX(-50%);background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(8px);color:rgba(255,255,255,.78);font-size:10px;font-weight:700;padding:7px 12px;border-radius:999px;z-index:16;white-space:nowrap;transition:opacity .3s}
+.streetview-scene.dragging .sv-drag-hint{opacity:.35}
+.ar-hotspot{transition:left .12s ease,top .12s ease,transform .12s ease,opacity .12s ease}
+.ar-hotspot.sv-hidden{opacity:0;pointer-events:none;transform:scale(.62)}
+.ar-hotspot .hs-circle{box-shadow:0 0 0 0 rgba(34,197,94,.48)}
+.ar-hotspot.sv-info-hotspot .hs-circle{background:rgba(30,95,212,.92)}
+.ar-hotspot.sv-portal .hs-circle{background:rgba(34,197,94,.94);font-size:15px;animation:hsRipple 1.8s infinite}
+.ar-hotspot.sv-portal .hs-label{background:rgba(22,101,52,.88)}
+.sv-zoom-chip{position:absolute;right:14px;top:154px;background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.75);font-size:10px;font-weight:700;padding:6px 9px;border-radius:999px;z-index:16}
+@media (max-height:760px){.sv-drag-hint{bottom:284px}.sv-room-pill{top:136px}.ar-prop-info{top:96px}.ar-nav-zone{bottom:124px}.ar-rooms-scroll{bottom:76px}}
+
+
+
+/* ── STREET VIEW AR V4: habitaciones realistas integradas ── */
+.streetview-scene{background:#06111f;}
+.sv-panorama{background:#07111f;}
+.sv-track{width:400%;height:100%;}
+.sv-panel.sv-real{position:relative;flex:0 0 25%;height:100%;overflow:hidden;background:linear-gradient(180deg,var(--sv-wall),var(--sv-wall2));perspective:900px;isolation:isolate;}
+.sv-panel.sv-real::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 22%,rgba(255,255,255,.38),transparent 34%),linear-gradient(90deg,rgba(255,255,255,.10),transparent 22%,transparent 78%,rgba(0,0,0,.12));z-index:0;pointer-events:none;}
+.sv-panel.sv-real::after{content:"";position:absolute;left:0;right:0;bottom:33%;height:15%;background:linear-gradient(180deg,transparent,rgba(0,0,0,.16));z-index:2;pointer-events:none;}
+.sv-wall{position:absolute;left:0;right:0;top:0;height:63%;background:linear-gradient(180deg,var(--sv-wall) 0%,var(--sv-wall2) 100%);border-bottom:6px solid rgba(15,23,42,.20);transform:translateY(var(--sv-pitch,0px));overflow:hidden;z-index:1;}
+.sv-wall::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.16) 0 1px,transparent 1px),linear-gradient(180deg,rgba(255,255,255,.12) 0 1px,transparent 1px);background-size:88px 88px;opacity:.25;}
+.sv-floor{position:absolute;left:-10%;right:-10%;bottom:-8%;height:49%;background:radial-gradient(ellipse at center top,rgba(255,255,255,.42),transparent 30%),linear-gradient(90deg,rgba(255,255,255,.13) 0 1px,transparent 1px),linear-gradient(0deg,rgba(0,0,0,.11) 0 1px,transparent 1px),linear-gradient(180deg,var(--sv-floor),var(--sv-floor2));background-size:auto,54px 54px,54px 54px,auto;transform-origin:center top;transform:perspective(720px) rotateX(62deg) scaleY(1.95) translateY(calc(var(--sv-pitch,0px) * .38));z-index:1;}
+.sv-floor::before{content:"";position:absolute;left:0;right:0;top:0;height:18px;background:linear-gradient(180deg,rgba(0,0,0,.19),transparent);}
+.sv-room-depth{position:absolute;inset:0;pointer-events:none;z-index:3;}
+.sv-room-depth::before,.sv-room-depth::after{content:"";position:absolute;top:7%;width:1px;height:78%;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(15,23,42,.22));}
+.sv-room-depth::before{left:8%;transform:skewY(-23deg)}
+.sv-room-depth::after{right:8%;transform:skewY(23deg)}
+.sv-baseboard{position:absolute;left:0;right:0;bottom:37%;height:10px;background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(15,23,42,.18));z-index:6;box-shadow:0 -1px 0 rgba(255,255,255,.26)}
+.sv-label-wall{bottom:calc(72% + var(--sv-pitch,0px));font-size:9px;background:rgba(15,23,42,.42);}
+.sv-built{position:absolute;left:var(--x,50%);bottom:var(--b,38%);width:var(--w,120px);height:var(--h,90px);transform:translateX(-50%) translateY(calc(var(--sv-pitch,0px) * .45)) scale(var(--s,1));transform-origin:center bottom;z-index:var(--z,8);filter:drop-shadow(0 16px 14px rgba(15,23,42,.24));}
+.sv-built.wall-object{transform:translateX(-50%) translateY(var(--sv-pitch,0px)) scale(var(--s,1));filter:drop-shadow(0 10px 10px rgba(15,23,42,.16));}
+.sv-built.floor-object{transform:translateX(-50%) scale(var(--s,1));}
+.sv-shadow{position:absolute;left:50%;bottom:-9px;width:86%;height:16px;background:rgba(15,23,42,.18);border-radius:50%;transform:translateX(-50%);filter:blur(7px);z-index:-1;}
+
+/* Arquitectura */
+.sv-window-real{height:88px;width:132px;border:7px solid rgba(71,85,105,.72);border-radius:12px;background:linear-gradient(180deg,#9bd7ff 0%,#dff6ff 64%,#f8fafc 100%);box-shadow:inset 0 0 0 3px rgba(255,255,255,.56),0 16px 22px rgba(15,23,42,.14);}
+.sv-window-real::before,.sv-window-real::after{content:"";position:absolute;background:rgba(71,85,105,.56)}
+.sv-window-real::before{left:50%;top:0;bottom:0;width:4px;transform:translateX(-50%)}
+.sv-window-real::after{left:0;right:0;top:50%;height:4px;transform:translateY(-50%)}
+.sv-window-wide{width:176px;height:92px;border-radius:10px;}
+.sv-door-real{width:78px;height:142px;border-radius:12px 12px 0 0;background:linear-gradient(90deg,#5c371f,#8b5e34 28%,#a06a3e 64%,#59351e);border:5px solid rgba(79,50,31,.85);box-shadow:inset -15px 0 24px rgba(0,0,0,.24),0 16px 20px rgba(15,23,42,.20);}
+.sv-door-real::before{content:"";position:absolute;left:12px;right:12px;top:18px;height:38px;border:2px solid rgba(255,255,255,.16);border-radius:5px;box-shadow:0 55px 0 -1px rgba(255,255,255,.08),0 55px 0 1px rgba(76,45,26,.38)}
+.sv-door-real::after{content:"";position:absolute;right:12px;top:70px;width:9px;height:9px;border-radius:50%;background:#facc15;box-shadow:0 0 8px rgba(250,204,21,.8)}
+.sv-wall-art{width:92px;height:62px;border:7px solid rgba(255,255,255,.72);border-radius:8px;background:linear-gradient(135deg,var(--sv-accent),rgba(255,255,255,.55) 48%,rgba(15,23,42,.16));box-shadow:0 13px 20px rgba(15,23,42,.14)}
+.sv-rug-real{width:190px;height:58px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,255,255,.18),transparent 35%),radial-gradient(ellipse at center,var(--sv-accent),rgba(30,95,212,.32) 62%,transparent 73%);filter:blur(.2px);opacity:.72;}
+
+/* Sala */
+.sv-sofa{width:188px;height:82px;}
+.sv-sofa .back{position:absolute;left:20px;right:20px;top:7px;height:50px;border-radius:20px 20px 12px 12px;background:linear-gradient(180deg,#6785b5,#355c93);box-shadow:inset 0 -8px 0 rgba(0,0,0,.10)}
+.sv-sofa .seat{position:absolute;left:14px;right:14px;bottom:10px;height:34px;border-radius:14px;background:linear-gradient(180deg,#456ca6,#274d83)}
+.sv-sofa .arm{position:absolute;bottom:8px;width:28px;height:55px;border-radius:15px;background:linear-gradient(180deg,#466da6,#24446f)}
+.sv-sofa .arm.l{left:0}.sv-sofa .arm.r{right:0}
+.sv-sofa .leg{position:absolute;bottom:0;width:10px;height:14px;border-radius:2px;background:#4b2d18}.sv-sofa .leg.l{left:38px}.sv-sofa .leg.r{right:38px}
+.sv-coffee-table{width:118px;height:48px;}
+.sv-coffee-table .top{position:absolute;left:6px;right:6px;top:4px;height:20px;border-radius:50%;background:linear-gradient(180deg,#d7b889,#916236);box-shadow:0 10px 12px rgba(0,0,0,.16)}
+.sv-coffee-table .leg{position:absolute;top:22px;width:8px;height:25px;background:#69421f;border-radius:4px}.sv-coffee-table .l{left:35px}.sv-coffee-table .r{right:35px}
+.sv-tv{width:128px;height:80px;}
+.sv-tv .screen{position:absolute;display:block;left:0;right:0;top:0;height:58px;border-radius:7px;background:linear-gradient(135deg,#0f172a,#1e293b 56%,#0b1120);border:6px solid #111827;box-shadow:0 16px 22px rgba(15,23,42,.18)}
+.sv-tv .screen::after{content:"";position:absolute;left:10px;top:8px;width:44px;height:2px;background:rgba(255,255,255,.18);box-shadow:18px 14px 0 rgba(255,255,255,.12),38px 28px 0 rgba(255,255,255,.10)}
+.sv-tv .console{position:absolute;left:16px;right:16px;bottom:0;height:18px;border-radius:5px;background:linear-gradient(180deg,#bfa17a,#8a6743)}
+.sv-plant{width:58px;height:82px;}
+.sv-plant .leaf{position:absolute;border-radius:60% 45% 65% 40%;background:linear-gradient(135deg,#22c55e,#15803d);width:28px;height:42px;top:0;left:15px;transform-origin:bottom center}.sv-plant .leaf.a{transform:rotate(-35deg)}.sv-plant .leaf.b{transform:rotate(0deg);top:-6px}.sv-plant .leaf.c{transform:rotate(34deg)}
+.sv-plant .pot{position:absolute;left:14px;bottom:0;width:32px;height:32px;border-radius:6px 6px 12px 12px;background:linear-gradient(180deg,#a16207,#713f12)}
+.sv-lamp{width:54px;height:104px;}.sv-lamp .shade{position:absolute;top:0;left:7px;width:40px;height:32px;background:linear-gradient(180deg,#fde68a,#f59e0b);clip-path:polygon(18% 0,82% 0,100% 100%,0 100%);border-radius:6px}.sv-lamp .pole{position:absolute;top:31px;left:25px;width:5px;height:58px;background:#64748b}.sv-lamp .base{position:absolute;bottom:0;left:10px;width:34px;height:9px;background:#64748b;border-radius:50%}
+.sv-bookshelf{width:92px;height:132px;background:linear-gradient(90deg,#6b4a2a,#9a6a3d,#6b4a2a);border-radius:8px;box-shadow:inset 0 0 0 5px rgba(255,255,255,.10)}
+.sv-bookshelf::before{content:"";position:absolute;left:10px;right:10px;top:18px;height:14px;background:#3b82f6;box-shadow:22px 0 #ef4444,44px 0 #22c55e,0 28px #f97316,25px 28px #a855f7,48px 28px #14b8a6,0 56px #facc15,25px 56px #38bdf8,48px 56px #f43f5e;border-radius:3px}
+
+/* Cocina */
+.sv-kitchen-set{width:250px;height:145px;}
+.sv-kitchen-set .upper{position:absolute;left:10px;right:10px;top:0;height:42px;background:linear-gradient(180deg,#f8fafc,#dce6ee);border-radius:8px;box-shadow:inset 0 -5px 0 rgba(0,0,0,.07)}
+.sv-kitchen-set .upper::before{content:"";position:absolute;left:33%;top:0;bottom:0;width:2px;background:rgba(71,85,105,.18);box-shadow:58px 0 rgba(71,85,105,.18)}
+.sv-kitchen-set .backsplash{position:absolute;left:18px;right:18px;top:48px;height:34px;background:linear-gradient(90deg,rgba(255,255,255,.55) 0 1px,transparent 1px),linear-gradient(180deg,rgba(255,255,255,.45) 0 1px,transparent 1px),#cbd5e1;background-size:22px 18px;border-radius:4px}
+.sv-kitchen-set .base{position:absolute;left:0;right:0;bottom:0;height:58px;background:linear-gradient(180deg,#e2e8f0,#b6c3ce);border-radius:8px 8px 4px 4px;border-top:9px solid #2f2f35;box-shadow:0 12px 18px rgba(15,23,42,.18)}
+.sv-kitchen-set .base::before{content:"";position:absolute;left:25%;top:0;bottom:0;width:2px;background:rgba(71,85,105,.18);box-shadow:58px 0 rgba(71,85,105,.18),118px 0 rgba(71,85,105,.18)}
+.sv-fridge{width:68px;height:132px;background:linear-gradient(90deg,#f8fafc,#cbd5e1);border-radius:10px;box-shadow:inset -9px 0 16px rgba(0,0,0,.08),0 16px 18px rgba(15,23,42,.18)}.sv-fridge::before{content:"";position:absolute;left:0;right:0;top:45%;height:3px;background:rgba(71,85,105,.22)}.sv-fridge::after{content:"";position:absolute;right:10px;top:28px;width:4px;height:35px;background:#94a3b8;border-radius:4px;box-shadow:0 48px 0 #94a3b8}
+.sv-island{width:160px;height:74px;}.sv-island .top{position:absolute;left:0;right:0;top:0;height:24px;border-radius:50%;background:linear-gradient(180deg,#f8fafc,#cbd5e1);box-shadow:0 8px 12px rgba(0,0,0,.13)}.sv-island .base{position:absolute;left:22px;right:22px;top:19px;height:48px;background:linear-gradient(180deg,#d9e2ec,#9fb0bf);border-radius:7px}.sv-stool{width:32px;height:54px}.sv-stool::before{content:"";position:absolute;top:0;left:3px;right:3px;height:13px;border-radius:50%;background:#734c2b}.sv-stool::after{content:"";position:absolute;left:14px;top:12px;width:5px;height:35px;background:#64748b;box-shadow:-9px 26px 0 -2px #64748b,9px 26px 0 -2px #64748b}
+.sv-shelf{width:120px;height:74px}.sv-shelf::before{content:"";position:absolute;left:0;right:0;top:13px;height:8px;background:#8b5e34;border-radius:4px;box-shadow:0 29px 0 #8b5e34}.sv-shelf::after{content:"";position:absolute;left:18px;top:0;width:16px;height:18px;background:#22c55e;border-radius:5px;box-shadow:34px 4px 0 #f97316,66px 2px 0 #3b82f6,12px 32px 0 #eab308,54px 31px 0 #ef4444}
+
+/* Comedor */
+.sv-dining{width:174px;height:90px}.sv-dining .table{position:absolute;left:26px;right:26px;top:20px;height:36px;border-radius:50%;background:linear-gradient(180deg,#d4a373,#8b5e34);box-shadow:0 16px 14px rgba(0,0,0,.18)}.sv-dining .chair{position:absolute;top:0;width:32px;height:56px;border-radius:10px;background:linear-gradient(180deg,#b08968,#7f5539)}.sv-dining .c1{left:0}.sv-dining .c2{right:0}.sv-dining .c3{left:70px;top:42px;transform:scale(.86)}
+.sv-pendant{width:110px;height:105px}.sv-pendant::before{content:"";position:absolute;top:0;left:54px;width:3px;height:54px;background:#64748b}.sv-pendant::after{content:"";position:absolute;left:32px;top:52px;width:48px;height:30px;border-radius:8px 8px 22px 22px;background:linear-gradient(180deg,#fde68a,#f59e0b);box-shadow:0 0 30px rgba(245,158,11,.28)}
+
+/* Habitación */
+.sv-bed{width:194px;height:104px}.sv-bed .head{position:absolute;left:18px;right:18px;top:0;height:66px;border-radius:18px;background:linear-gradient(180deg,#8b5e34,#5c3b21)}.sv-bed .mattress{position:absolute;left:0;right:0;bottom:8px;height:58px;border-radius:18px;background:linear-gradient(180deg,#f8fafc,#e2e8f0);box-shadow:0 14px 18px rgba(15,23,42,.18)}.sv-bed .blanket{position:absolute;left:36px;right:12px;bottom:8px;height:38px;border-radius:0 15px 15px 0;background:linear-gradient(135deg,var(--sv-accent),rgba(255,255,255,.35))}.sv-bed .pillow{position:absolute;left:22px;top:34px;width:52px;height:20px;border-radius:12px;background:#fff;box-shadow:55px 0 0 #fff}
+.sv-nightstand{width:44px;height:52px;background:linear-gradient(180deg,#b08968,#7f5539);border-radius:8px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.11)}.sv-nightstand::before{content:"";position:absolute;left:8px;right:8px;top:13px;height:3px;background:rgba(255,255,255,.28);box-shadow:0 17px 0 rgba(255,255,255,.22)}
+.sv-wardrobe{width:112px;height:142px;background:linear-gradient(90deg,#7f5539,#b08968 48%,#8b5e34);border-radius:10px;box-shadow:inset 0 0 0 6px rgba(255,255,255,.10)}.sv-wardrobe::before{content:"";position:absolute;left:50%;top:8px;bottom:8px;width:2px;background:rgba(70,42,24,.35)}.sv-wardrobe::after{content:"";position:absolute;left:44%;top:62px;width:7px;height:7px;border-radius:50%;background:#fde68a;box-shadow:18px 0 #fde68a}
+.sv-dresser{width:104px;height:72px;background:linear-gradient(180deg,#c49a6c,#8b5e34);border-radius:9px}.sv-dresser::before{content:"";position:absolute;left:12px;right:12px;top:16px;height:3px;background:rgba(255,255,255,.28);box-shadow:0 20px 0 rgba(255,255,255,.22),0 40px 0 rgba(255,255,255,.18)}
+.sv-mirror{width:56px;height:116px;border-radius:999px;background:linear-gradient(135deg,#e0f2fe,#f8fafc);border:6px solid #94a3b8;box-shadow:0 12px 18px rgba(15,23,42,.16)}
+
+/* Baño */
+.sv-vanity{width:134px;height:116px}.sv-vanity .mirror{position:absolute;left:34px;top:0;width:66px;height:54px;border-radius:12px;background:linear-gradient(135deg,#bae6fd,#f8fafc);border:5px solid #94a3b8}.sv-vanity .counter{position:absolute;left:0;right:0;top:62px;height:16px;border-radius:50%;background:#f8fafc}.sv-vanity .base{position:absolute;left:16px;right:16px;top:72px;height:42px;border-radius:8px;background:linear-gradient(180deg,#cbd5e1,#94a3b8)}.sv-vanity .sink{position:absolute;left:51px;top:57px;width:32px;height:18px;border-radius:50%;background:#e0f2fe;border:3px solid #fff}
+.sv-shower{width:104px;height:158px;border:6px solid rgba(148,163,184,.75);border-radius:14px;background:linear-gradient(135deg,rgba(224,242,254,.62),rgba(255,255,255,.22));box-shadow:inset 0 0 24px rgba(255,255,255,.24)}.sv-shower::before{content:"";position:absolute;left:22px;right:22px;top:18px;height:8px;border-radius:50%;background:#64748b;box-shadow:0 24px 0 -2px rgba(56,189,248,.8),-10px 40px 0 -3px rgba(56,189,248,.55),10px 48px 0 -4px rgba(56,189,248,.55)}
+.sv-toilet{width:82px;height:82px}.sv-toilet::before{content:"";position:absolute;left:22px;right:22px;top:2px;height:35px;border-radius:9px;background:#f8fafc;border:3px solid #dbeafe}.sv-toilet::after{content:"";position:absolute;left:8px;right:8px;bottom:0;height:42px;border-radius:50% 50% 18px 18px;background:#ffffff;border:4px solid #dbeafe;box-shadow:0 12px 15px rgba(15,23,42,.15)}
+.sv-tub{width:162px;height:74px}.sv-tub::before{content:"";position:absolute;left:0;right:0;bottom:8px;height:46px;border-radius:12px 12px 36px 36px;background:linear-gradient(180deg,#fff,#dbeafe);border:4px solid #bfdbfe;box-shadow:0 14px 16px rgba(15,23,42,.18)}.sv-tub::after{content:"";position:absolute;right:18px;top:0;width:24px;height:36px;border:5px solid #94a3b8;border-left:none;border-bottom:none;border-radius:0 12px 0 0}
+.sv-towel{width:62px;height:54px}.sv-towel::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:#64748b;border-radius:3px}.sv-towel::after{content:"";position:absolute;left:10px;right:10px;top:5px;height:44px;background:linear-gradient(180deg,var(--sv-accent),rgba(255,255,255,.35));border-radius:3px 3px 10px 10px}
+
+/* Exterior / balcón / terraza / jardín */
+.room-balcon .sv-wall,.room-terraza .sv-wall,.room-jardin .sv-wall{background:linear-gradient(180deg,#60a5fa 0%,#bfdbfe 48%,#dbeafe 100%);}
+.room-balcon .sv-floor,.room-terraza .sv-floor,.room-jardin .sv-floor{background:radial-gradient(ellipse at center top,rgba(255,255,255,.4),transparent 32%),linear-gradient(90deg,rgba(255,255,255,.10) 0 1px,transparent 1px),linear-gradient(0deg,rgba(0,0,0,.10) 0 1px,transparent 1px),linear-gradient(180deg,#bda77d,#796a4e);background-size:auto,48px 48px,48px 48px,auto;}
+.sv-skyline{width:260px;height:118px;filter:none}.sv-skyline::before{content:"";position:absolute;left:0;right:0;bottom:0;height:58px;background:linear-gradient(180deg,#334155,#0f172a);clip-path:polygon(0 100%,0 35%,8% 35%,8% 15%,18% 15%,18% 42%,29% 42%,29% 23%,39% 23%,39% 55%,48% 55%,48% 10%,60% 10%,60% 38%,72% 38%,72% 22%,82% 22%,82% 48%,93% 48%,93% 30%,100% 30%,100% 100%)}.sv-skyline::after{content:"";position:absolute;left:28px;bottom:78px;width:42px;height:42px;border-radius:50%;background:#fde68a;box-shadow:0 0 34px rgba(253,230,138,.72)}
+.sv-rail{width:270px;height:78px}.sv-rail::before{content:"";position:absolute;left:0;right:0;bottom:34px;height:8px;background:rgba(255,255,255,.68);border-radius:5px}.sv-rail::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:50px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.62) 0 6px,transparent 6px 28px);border-bottom:6px solid rgba(255,255,255,.62)}
+.sv-outdoor-set{width:156px;height:86px}.sv-outdoor-set .chair{position:absolute;bottom:10px;width:48px;height:50px;border-radius:12px 12px 6px 6px;background:linear-gradient(180deg,#f97316,#9a3412)}.sv-outdoor-set .c1{left:4px}.sv-outdoor-set .c2{right:4px}.sv-outdoor-set .table{position:absolute;left:58px;bottom:12px;width:42px;height:30px;border-radius:50%;background:linear-gradient(180deg,#f8fafc,#94a3b8)}
+.sv-bbq{width:88px;height:82px}.sv-bbq::before{content:"";position:absolute;left:12px;right:12px;top:18px;height:42px;border-radius:0 0 26px 26px;background:#1f2937}.sv-bbq::after{content:"";position:absolute;left:8px;right:8px;top:6px;height:16px;border-radius:50%;background:#374151;box-shadow:16px 52px 0 -4px #111827,48px 52px 0 -4px #111827}
+
+/* Estudio / zona social */
+.sv-desk{width:148px;height:90px}.sv-desk .top{position:absolute;left:0;right:0;top:37px;height:16px;border-radius:6px;background:#8b5e34}.sv-desk .leg{position:absolute;top:50px;width:9px;height:38px;background:#5c3b21}.sv-desk .l{left:18px}.sv-desk .r{right:18px}.sv-desk .monitor{position:absolute;left:47px;top:0;width:54px;height:36px;border-radius:5px;background:#0f172a;border:4px solid #334155}.sv-desk .monitor::after{content:"";position:absolute;left:18px;bottom:-15px;width:14px;height:15px;background:#64748b}
+.sv-chair-office{width:58px;height:76px}.sv-chair-office::before{content:"";position:absolute;left:9px;right:9px;top:0;height:46px;border-radius:14px;background:linear-gradient(180deg,#334155,#111827)}.sv-chair-office::after{content:"";position:absolute;left:16px;bottom:4px;width:26px;height:26px;border-radius:50%;background:#475569;box-shadow:0 28px 0 -10px #111827}
+.sv-pool{width:202px;height:88px;border-radius:50%;background:radial-gradient(ellipse at center,#67e8f9,#0891b2 72%,#0e7490);border:8px solid #e2e8f0;box-shadow:0 16px 18px rgba(15,23,42,.18)}.sv-pool::before{content:"";position:absolute;inset:18px;border-radius:50%;background:repeating-linear-gradient(140deg,rgba(255,255,255,.28) 0 8px,transparent 8px 20px);opacity:.7}.sv-gym{width:118px;height:82px}.sv-gym::before{content:"";position:absolute;left:18px;top:26px;width:82px;height:10px;background:#1f2937;border-radius:6px;box-shadow:-18px 0 0 7px #334155,18px 0 0 7px #334155}.sv-gym::after{content:"";position:absolute;left:36px;top:52px;width:46px;height:14px;border-radius:8px;background:#64748b}
+
+/* Ajustes por habitación */
+.room-cocina .sv-wall{background:linear-gradient(180deg,#effaf1,#dcebdd)}
+.room-bano .sv-wall,.room-bano-principal .sv-wall,.room-bano-de-lujo .sv-wall{background:linear-gradient(180deg,#e5f6ff,#d1e7f4)}
+.room-habitacion .sv-wall,.room-vestier .sv-wall{background:linear-gradient(180deg,#f4effd,#dfd7ec)}
+.room-comedor .sv-wall{background:linear-gradient(180deg,#fff6e8,#ead7bd)}
+.room-estudio .sv-wall{background:linear-gradient(180deg,#f6ead9,#dfc5a5)}
+.room-zona-social .sv-wall{background:linear-gradient(180deg,#ede9fe,#d8b4fe)}
+
+@media (max-height:760px){.sv-built{transform:translateX(-50%) translateY(calc(var(--sv-pitch,0px) * .36)) scale(calc(var(--s,1) * .92));}.sv-label-wall{bottom:71%;}}
+
+
+.sv-sideboard{width:120px;height:72px;background:linear-gradient(180deg,#c49a6c,#8b5e34);border-radius:9px;box-shadow:0 14px 16px rgba(15,23,42,.18)}
+.sv-sideboard::before{content:"";position:absolute;left:10px;right:10px;top:16px;height:3px;background:rgba(255,255,255,.28);box-shadow:0 18px 0 rgba(255,255,255,.22),0 36px 0 rgba(255,255,255,.18)}
+.sv-outdoor-set{width:164px;height:88px}
+.sv-outdoor-set::before{content:"";position:absolute;left:46px;top:18px;width:72px;height:24px;border-radius:50%;background:linear-gradient(180deg,#d6b98a,#8b5e34);box-shadow:0 16px 14px rgba(0,0,0,.16)}
+.sv-outdoor-set::after{content:"";position:absolute;left:0;top:0;width:40px;height:62px;border-radius:14px;background:linear-gradient(180deg,#94a3b8,#475569);box-shadow:124px 0 0 #64748b,20px 54px 0 -8px #64748b,104px 54px 0 -8px #64748b}
+.sv-lounger{width:168px;height:84px}
+.sv-lounger::before{content:"";position:absolute;left:14px;right:14px;top:20px;height:34px;border-radius:18px;background:linear-gradient(180deg,#f8fafc,#cbd5e1);transform:skewX(-18deg);box-shadow:0 14px 16px rgba(15,23,42,.18)}
+.sv-lounger::after{content:"";position:absolute;left:108px;top:0;width:42px;height:22px;border-radius:10px;background:#e2e8f0;transform:skewX(-18deg)}
+.sv-planter-box{width:90px;height:46px;background:linear-gradient(180deg,#8b5e34,#5c3b21);border-radius:8px}
+.sv-planter-box::before{content:"";position:absolute;left:8px;top:-16px;width:18px;height:28px;border-radius:60% 45% 65% 40%;background:#22c55e;box-shadow:18px 4px 0 #16a34a,38px -2px 0 #22c55e,54px 6px 0 #16a34a}
+
+
+/* V6: eliminar interfaz flotante de controles AR */
+.ar-nav-zone{display:none !important;}
+.ar-rooms-scroll{bottom:96px;}
+.sv-drag-hint{bottom:138px;}
+@media (max-height:760px){.sv-drag-hint{bottom:124px}.ar-rooms-scroll{bottom:88px}}
+
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- ══════════ SCREEN 1: HOME ══════════ -->
+<div class="screen active" id="screen-home">
+  <div class="onboarding-bg"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="home-content">
+    <div class="logo-badge">
+      <div class="logo-icon">🏠</div>
+      <span class="logo-text">VirtuCasa</span>
+    </div>
+    <h1 class="hero-tagline">Visita, diseña y<br><span>vive tu hogar</span><br>antes de que exista</h1>
+    <p class="hero-sub">Explora propiedades en realidad aumentada simulada, personaliza cada espacio y toma la mejor decisión sin salir de casa.</p>
+    <div class="features-mini">
+      <div class="feat-row"><span class="feat-icon">🔍</span><span class="feat-text">Busca y filtra propiedades en Bogotá</span></div>
+      <div class="feat-row"><span class="feat-icon">🥽</span><span class="feat-text">Recorre espacios en AR con navegación libre</span></div>
+      <div class="feat-row"><span class="feat-icon">🛋️</span><span class="feat-text">Amobla y decora antes de decidir</span></div>
+    </div>
+    <button class="btn-primary" onclick="navigate('explore')">🏘️ Explorar inmuebles</button>
+    <button class="btn-secondary" onclick="navigate('admin')">🏢 Soy inmobiliaria</button>
+  </div>
+</div>
+
+<!-- ══════════ SCREEN 2: EXPLORE ══════════ -->
+<div class="screen" id="screen-explore">
+  <div class="top-bar">
+    <div class="top-bar-row"><span class="screen-title">Inmuebles</span><button class="icon-btn">🔔</button></div>
+    <div class="search-bar"><span>🔍</span><input type="text" placeholder="Buscar por barrio o ciudad..." id="search-input" oninput="filterProperties()"></div>
+  </div>
+  <div class="scroll-area">
+    <div class="filters-scroll">
+      <div class="filter-chip active" onclick="setFilter(this,'all')">Todos</div>
+      <div class="filter-chip" onclick="setFilter(this,'compra')">Compra</div>
+      <div class="filter-chip" onclick="setFilter(this,'arriendo')">Arriendo</div>
+      <div class="filter-chip" onclick="setFilter(this,'apartamento')">Apartamentos</div>
+      <div class="filter-chip" onclick="setFilter(this,'casa')">Casas</div>
+      <div class="filter-chip" onclick="setFilter(this,'apartaestudio')">Apartaestudios</div>
+      <div class="filter-chip" onclick="setFilter(this,'3+')">3+ hab.</div>
+    </div>
+    <div class="section-label" id="results-label">6 propiedades encontradas</div>
+    <div class="properties-grid" id="properties-grid"></div>
+    <div style="height:16px"></div>
+  </div>
+</div>
+
+<!-- ══════════ SCREEN 3: DETAIL ══════════ -->
+<div class="screen" id="screen-detail">
+  <div class="scroll-area">
+    <div style="position:relative">
+      <div class="detail-hero" id="detail-hero-img">
+        <button class="detail-back" onclick="navigate('explore')">←</button>
+        <div class="gallery-dots"><div class="gallery-dot active"></div><div class="gallery-dot"></div><div class="gallery-dot"></div></div>
+      </div>
+    </div>
+    <div class="detail-body">
+      <div class="detail-price" id="det-price">—</div>
+      <div class="detail-location" id="det-location">📍 —</div>
+      <div class="detail-stats">
+        <div class="detail-stat"><span class="val" id="det-area">—</span><span class="key">Área m²</span></div>
+        <div class="detail-stat"><span class="val" id="det-rooms">—</span><span class="key">Hab.</span></div>
+        <div class="detail-stat"><span class="val" id="det-baths">—</span><span class="key">Baños</span></div>
+        <div class="detail-stat"><span class="val" id="det-estrato">—</span><span class="key">Estrato</span></div>
+      </div>
+      <div class="section-heading">Descripción</div>
+      <p class="detail-desc" id="det-desc">—</p>
+      <div class="section-heading">Características</div>
+      <div class="features-grid" id="det-features"></div>
+      <div class="section-heading mt-16">Acciones</div>
+      <div class="detail-cta-stack">
+        <button class="btn-cta-green" onclick="toggleFav()"><span id="fav-btn-icon">♡</span><span id="fav-btn-text">Guardar en favoritos</span></button>
+        <button class="btn-cta-blue" onclick="navigate('ar')">🥽 Iniciar recorrido AR</button>
+        <button class="btn-cta-blue" onclick="navigate('decor')">🛋️ Decorar espacio</button>
+        <button class="btn-cta-outline" onclick="navigate('schedule')">📅 Agendar visita</button>
+        <button class="btn-cta-outline" onclick="showToast('📞 Conectando con la inmobiliaria...')">📞 Contactar inmobiliaria</button>
+      </div>
+    </div>
+    <div style="height:16px"></div>
+  </div>
+</div>
+
+<!-- ══════════ SCREEN 4: AR TOUR (ENHANCED) ══════════ -->
+<div class="screen" id="screen-ar">
+  <div class="ar-shell">
+    <div class="ar-viewport" id="ar-viewport">
+
+      <!-- Street View style 360 scene -->
+      <div class="ar-scene streetview-scene" id="ar-scene" aria-label="Recorrido AR tipo Street View">
+        <div class="sv-panorama" id="sv-panorama">
+          <div class="sv-loader">Preparando recorrido 360°...</div>
+        </div>
+        <div class="sv-center-reticle" aria-hidden="true"><span></span></div>
+        <div class="sv-room-pill" id="sv-room-pill">Sala</div>
+        <div class="sv-drag-hint" id="sv-drag-hint">Arrastra para mirar 360° · Usa las flechas para avanzar</div>
+      </div>
+
+      <!-- Overlays -->
+      <div class="ar-scan-lines" id="ar-scan-lines"></div>
+      <div class="ar-grid" id="ar-grid"></div>
+      <div class="ar-vignette"></div>
+      <div class="ar-move-flash" id="ar-move-flash"></div>
+      <div class="ar-corner tl" id="ar-c1"></div>
+      <div class="ar-corner tr" id="ar-c2"></div>
+      <div class="ar-corner bl" id="ar-c3"></div>
+      <div class="ar-corner br" id="ar-c4"></div>
+
+      <!-- HUD Top -->
+      <div class="ar-hud-top">
+        <button class="ar-back-btn" onclick="navigate('detail')">←</button>
+        <div class="ar-status">
+          <div class="ar-mode-badge" id="ar-mode-badge"><div class="ar-dot"></div><span id="ar-mode-text">ESTÁNDAR</span></div>
+          <div class="ar-compass" id="ar-compass">N ↑ · Sala · Paso 1/4</div>
+        </div>
+        <div class="ar-hud-btns">
+          <div class="ar-hud-btn" onclick="showToast('🔊 Audio activado')">🔊</div>
+          <div class="ar-hud-btn" onclick="toggleGrid()">📐</div>
+        </div>
+      </div>
+
+      <!-- Property info strip -->
+      <div class="ar-prop-info" id="ar-prop-info">
+        <div>
+          <div class="ar-prop-name" id="ar-prop-name">Apartamento Chapinero</div>
+          <div class="ar-prop-loc" id="ar-prop-loc">📍 Bogotá · Estrato 4</div>
+        </div>
+        <div class="ar-prop-area" id="ar-prop-area">72 m²</div>
+      </div>
+
+      <!-- Hotspots -->
+      <div id="ar-hotspots-container"></div>
+
+      <!-- Info panel -->
+      <div class="ar-info-panel" id="ar-info-panel">
+        <button class="ar-info-close" onclick="closeInfoPanel()">✕</button>
+        <div class="ar-info-title" id="ar-info-title">Sala principal</div>
+        <div class="ar-info-grid" id="ar-info-grid"></div>
+      </div>
+
+      <!-- Nav controls -->
+      <div class="ar-nav-zone">
+        <div class="ar-nav-row">
+          <div class="ar-nav-btn" onclick="arMove('left')" title="Girar izquierda">↺</div>
+          <div class="ar-nav-up" onclick="arMove('forward')" title="Avanzar">⬆</div>
+          <div class="ar-nav-btn" onclick="arMove('right')" title="Girar derecha">↻</div>
+        </div>
+        <div class="ar-nav-row">
+          <div class="ar-nav-btn" onclick="arMove('prev-room')" title="Habitación anterior">◀</div>
+          <div class="ar-nav-center" onclick="arMove('forward')"><span style="font-size:18px">🚶</span><span>IR</span></div>
+          <div class="ar-nav-btn" onclick="arMove('next-room')" title="Habitación siguiente">▶</div>
+        </div>
+        <div class="ar-nav-row">
+          <div class="ar-nav-btn" onclick="arMove('back')" title="Retroceder" style="width:130px;border-radius:16px;justify-content:center;gap:6px">⬇ Retroceder</div>
+        </div>
+        <div class="ar-step-counter" id="ar-step-counter">Paso 1 de 4 · Usa las flechas para navegar</div>
+      </div>
+
+      <!-- Room tabs -->
+      <div class="ar-rooms-scroll" id="ar-rooms-scroll"></div>
+    </div>
+
+    <!-- Bottom panel -->
+    <div class="ar-bottom-panel">
+      <div class="ar-bottom-row">
+        <button class="btn-ar-activate" id="btn-ar-mode" onclick="toggleARMode()">🥽 Activar modo AR</button>
+        <button class="btn-ar-decor" onclick="navigate('decor')">🛋️ Decorar</button>
+      </div>
+      <div class="ar-demo-note">⚠️ Recorrido AR simulado para demo · Sin hardware especial requerido</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SCREEN 5: DECORATION (ENHANCED) ══════════ -->
+<div class="screen" id="screen-decor">
+  <div class="top-bar" style="padding-top:52px">
+    <div class="top-bar-row">
+      <button class="icon-btn" onclick="navigate('detail')">←</button>
+      <span class="screen-title">Decorar espacio</span>
+      <button class="icon-btn" onclick="clearAll()">🗑️</button>
+    </div>
+  </div>
+  <div class="scroll-area">
+    <!-- Room canvas -->
+    <div class="decor-canvas" id="decor-canvas" onclick="deselectItem()">
+      <div class="dc-wall" id="dc-wall"></div>
+      <div class="dc-floor" id="dc-floor"></div>
+      <div class="dc-window"><div class="dc-window-cross"></div><div class="dc-window-cross2"></div></div>
+      <div class="dc-ceiling-line"></div>
+      <div class="dc-baseboard"></div>
+      <div class="dc-skirting"></div>
+      <div class="dc-furniture-layer" id="placed-furniture"></div>
+    </div>
+
+    <!-- Room selector -->
+    <div class="decor-room-selector" id="decor-room-selector"></div>
+
+    <!-- Controls -->
+    <div class="decor-controls">
+      <div class="ctrl-row">
+        <span class="ctrl-label">Estilo</span>
+        <div class="style-tabs" id="style-tabs">
+          <button class="style-tab active" onclick="setStyle(this,'Moderno')">Moderno</button>
+          <button class="style-tab" onclick="setStyle(this,'Minimalista')">Minimalista</button>
+          <button class="style-tab" onclick="setStyle(this,'Clásico')">Clásico</button>
+          <button class="style-tab" onclick="setStyle(this,'Industrial')">Industrial</button>
+          <button class="style-tab" onclick="setStyle(this,'Familiar')">Familiar</button>
+        </div>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-label">Color</span>
+        <div class="color-swatches" id="color-swatches">
+          <div class="cs-swatch active" style="background:#FFFFFF;border:1.5px solid #CBD5E1" onclick="setColor(this,'Blanco')"></div>
+          <div class="cs-swatch" style="background:#8B7355" onclick="setColor(this,'Madera')"></div>
+          <div class="cs-swatch" style="background:#1E3A5F" onclick="setColor(this,'Azul noche')"></div>
+          <div class="cs-swatch" style="background:#2D5016" onclick="setColor(this,'Verde bosque')"></div>
+          <div class="cs-swatch" style="background:#4A4A4A" onclick="setColor(this,'Gris carbón')"></div>
+          <div class="cs-swatch" style="background:#8B1A1A" onclick="setColor(this,'Vino tinto')"></div>
+          <div class="cs-swatch" style="background:#D4A017" onclick="setColor(this,'Dorado')"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Catalog -->
+    <div class="furniture-catalog">
+      <div class="cat-scroll" id="cat-scroll"></div>
+      <div class="furniture-grid" id="furniture-grid"></div>
+    </div>
+
+    <!-- Design summary -->
+    <div class="design-summary" id="design-summary" style="display:none">
+      <div class="ds-title">📋 Resumen del diseño</div>
+      <div class="ds-row"><span class="ds-label">Habitación:</span><span class="ds-val" id="ds-room">—</span></div>
+      <div class="ds-row"><span class="ds-label">Estilo:</span><span class="ds-val" id="ds-style">—</span></div>
+      <div class="ds-row"><span class="ds-label">Color:</span><span class="ds-val" id="ds-color">—</span></div>
+      <div class="ds-row"><span class="ds-label">Muebles:</span><span class="ds-val" id="ds-count">—</span></div>
+      <div class="ds-items" id="ds-items"></div>
+    </div>
+
+    <button class="btn-save-design" onclick="saveDesign()">💾 Guardar diseño</button>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- ══════════ SCREEN 6: FAVORITOS ══════════ -->
+<div class="screen" id="screen-favs">
+  <div class="top-bar"><div class="top-bar-row"><span class="screen-title">Favoritos</span><button class="icon-btn" onclick="openCompare()">⚖️</button></div></div>
+  <div class="scroll-area">
+    <div id="favs-content" style="padding:16px 20px 0"></div>
+    <div class="compare-bar"><button class="btn-compare" onclick="openCompare()">⚖️ Comparar propiedades</button></div>
+    <div style="height:16px"></div>
+  </div>
+</div>
+
+<!-- ══════════ SCREEN 7: AGENDAR ══════════ -->
+<div class="screen" id="screen-schedule">
+  <div class="top-bar"><div class="top-bar-row"><button class="icon-btn" onclick="navigate('detail')">←</button><span class="screen-title">Agendar visita</span><div style="width:40px"></div></div></div>
+  <div class="scroll-area">
+    <div class="form-card">
+      <div class="section-heading">Tus datos</div>
+      <div class="form-group"><label class="form-label">Nombre completo</label><input type="text" class="form-input" placeholder="Ej: María Martínez" id="sch-name"></div>
+      <div class="form-group"><label class="form-label">Correo electrónico</label><input type="email" class="form-input" placeholder="correo@ejemplo.com" id="sch-email"></div>
+      <div class="form-group"><label class="form-label">Teléfono</label><input type="tel" class="form-input" placeholder="+57 300 000 0000" id="sch-phone"></div>
+      <div class="section-heading mt-16">Fecha y hora</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Fecha</label><input type="date" class="form-input" id="sch-date"></div>
+        <div class="form-group"><label class="form-label">Hora</label><input type="time" class="form-input" id="sch-time"></div>
+      </div>
+      <div class="section-heading">Tipo de visita</div>
+      <div class="visit-types">
+        <div class="visit-type active" onclick="selectVisitType(this)"><span class="vt-icon">🏠</span><span class="vt-label">Presencial</span></div>
+        <div class="visit-type" onclick="selectVisitType(this)"><span class="vt-icon">💻</span><span class="vt-label">Virtual</span></div>
+      </div>
+    </div>
+    <div style="padding:0 20px 16px"><button class="btn-cta-green" onclick="confirmVisit()">📅 Confirmar visita</button></div>
+    <div class="confirm-msg" id="confirm-msg">
+      <div style="font-size:40px;margin-bottom:8px">✅</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#166534;margin-bottom:4px">¡Visita confirmada!</div>
+      <div style="font-size:12px;color:#16A34A">Recibirás los detalles en tu correo en breve.</div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- ══════════ SCREEN 8: ADMIN ══════════ -->
+<div class="screen" id="screen-admin">
+  <div class="top-bar"><div class="top-bar-row"><button class="icon-btn" onclick="navigate('home')">←</button><span class="screen-title">Panel Inmobiliaria</span><button class="icon-btn">⚙️</button></div></div>
+  <div class="scroll-area">
+    <div class="metrics-grid">
+      <div class="metric-card"><div style="font-size:24px;margin-bottom:8px">👁️</div><div class="metric-val">4.287</div><div class="metric-label">Visualizaciones</div><div class="metric-trend">↑ +18%</div></div>
+      <div class="metric-card"><div style="font-size:24px;margin-bottom:8px">❤️</div><div class="metric-val">312</div><div class="metric-label">Favoritos</div><div class="metric-trend">↑ +7%</div></div>
+      <div class="metric-card"><div style="font-size:24px;margin-bottom:8px">📞</div><div class="metric-val">89</div><div class="metric-label">Contactos</div><div class="metric-trend">↑ +22%</div></div>
+      <div class="metric-card"><div style="font-size:24px;margin-bottom:8px">📅</div><div class="metric-val">34</div><div class="metric-label">Visitas agendadas</div><div class="metric-trend">↑ +5 esta semana</div></div>
+    </div>
+    <div class="section-label">Propiedades publicadas</div>
+    <div class="admin-section" id="admin-props-list"></div>
+    <button class="btn-add-prop" onclick="toggleAddForm()">＋ Agregar nueva propiedad</button>
+    <div class="add-prop-form" id="add-prop-form">
+      <div class="section-heading">Nueva propiedad</div>
+      <div class="form-group"><label class="form-label">Título</label><input class="form-input" placeholder="Apartamento moderno en Chapinero"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Precio (COP)</label><input class="form-input" placeholder="380.000.000"></div>
+        <div class="form-group"><label class="form-label">Área (m²)</label><input class="form-input" placeholder="72"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Habitaciones</label><input class="form-input" placeholder="3"></div>
+        <div class="form-group"><label class="form-label">Baños</label><input class="form-input" placeholder="2"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Ubicación</label><input class="form-input" placeholder="Bogotá, Chapinero"></div>
+      <div class="form-group"><label class="form-label">Tipo de operación</label><select class="form-input"><option>Venta</option><option>Arriendo</option></select></div>
+      <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-input" rows="3" placeholder="Describe el inmueble..."></textarea></div>
+      <button class="btn-cta-green" onclick="publishProperty()">📤 Publicar propiedad</button>
+    </div>
+    <div class="section-label">Clientes interesados</div>
+    <div style="padding:0 20px">
+      <div class="admin-prop-row"><div style="width:44px;height:44px;border-radius:50%;background:#EEF3FD;display:flex;align-items:center;justify-content:center;font-size:18px">👩</div><div><div style="font-size:13px;font-weight:700">Laura Gómez</div><div style="font-size:11px;color:var(--gray-500)">Agendó visita presencial</div></div><div style="margin-left:auto;font-size:10px;color:var(--gray-400)">Hace 2h</div></div>
+      <div class="admin-prop-row"><div style="width:44px;height:44px;border-radius:50%;background:#FEF3C7;display:flex;align-items:center;justify-content:center;font-size:18px">👨</div><div><div style="font-size:13px;font-weight:700">Carlos Mora</div><div style="font-size:11px;color:var(--gray-500)">Guardó en favoritos</div></div><div style="margin-left:auto;font-size:10px;color:var(--gray-400)">Hace 5h</div></div>
+      <div class="admin-prop-row"><div style="width:44px;height:44px;border-radius:50%;background:#F0FDF4;display:flex;align-items:center;justify-content:center;font-size:18px">👩‍💼</div><div><div style="font-size:13px;font-weight:700">Andrea Ríos</div><div style="font-size:11px;color:var(--gray-500)">Solicitó información AR</div></div><div style="margin-left:auto;font-size:10px;color:var(--gray-400)">Ayer</div></div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- ══════════ SCREEN 9: PERFIL ══════════ -->
+<div class="screen" id="screen-profile">
+  <div class="scroll-area">
+    <div class="profile-hero">
+      <div class="profile-avatar">👤</div>
+      <div class="profile-name">Santiago Vargas</div>
+      <div style="margin-top:4px;color:rgba(255,255,255,.6);font-size:13px">santiago@javeriana.edu.co</div>
+      <div style="margin-top:10px"><span style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:white;font-size:11px;font-weight:700;padding:4px 12px;border-radius:50px;display:inline-flex;align-items:center;gap:6px">⭐ Plan Gratuito</span></div>
+    </div>
+    <div class="plan-cards">
+      <div class="plan-card">
+        <div class="plan-name">Gratuito</div>
+        <div class="plan-price">$0 <span style="font-size:13px;font-weight:500;color:var(--gray-500)">/ mes</span></div>
+        <div class="plan-features">
+          <div class="plan-feature"><span>✅</span> Búsqueda de propiedades</div>
+          <div class="plan-feature"><span>✅</span> 3 favoritos</div>
+          <div class="plan-feature"><span>✅</span> 2 recorridos AR por mes</div>
+          <div class="plan-feature"><span style="color:var(--gray-300)">✗</span><span style="color:var(--gray-400)"> Guardar diseños</span></div>
+          <div class="plan-feature"><span style="color:var(--gray-300)">✗</span><span style="color:var(--gray-400)"> Comparación avanzada</span></div>
+        </div>
+      </div>
+      <div class="plan-card premium">
+        <div class="plan-name">✨ Premium</div>
+        <div class="plan-price">$9.97 <span style="font-size:13px;font-weight:500;color:var(--gray-500)">USD / mes</span></div>
+        <div style="font-size:12px;color:var(--green-dark);font-weight:700;margin-top:4px">≈ $41.800 COP/mes</div>
+        <div class="plan-features">
+          <div class="plan-feature"><span>✅</span> Recorridos AR ilimitados</div>
+          <div class="plan-feature"><span>✅</span> Navegación libre completa por espacios</div>
+          <div class="plan-feature"><span>✅</span> Guardar diseños de decoración</div>
+          <div class="plan-feature"><span>✅</span> Catálogo extendido de muebles</div>
+          <div class="plan-feature"><span>✅</span> Comparación avanzada</div>
+          <div class="plan-feature"><span>✅</span> Acceso prioritario a nuevos inmuebles</div>
+        </div>
+        <button class="btn-upgrade" onclick="showToast('🚀 Redirigiendo a pago seguro...')">🚀 Actualizar a Premium</button>
+      </div>
+    </div>
+    <div class="profile-menu">
+      <div class="profile-menu-item" onclick="showToast('⚙️ Configuración en desarrollo')"><span style="font-size:20px">⚙️</span><span style="flex:1;font-size:14px;font-weight:600;color:var(--gray-700)">Configuración</span><span style="color:var(--gray-400)">›</span></div>
+      <div class="profile-menu-item" onclick="showToast('📐 Diseños guardados: '+S.savedDesigns.length)"><span style="font-size:20px">🎨</span><span style="flex:1;font-size:14px;font-weight:600;color:var(--gray-700)">Mis diseños guardados</span><span style="color:var(--gray-400)">›</span></div>
+      <div class="profile-menu-item" onclick="navigate('favs')"><span style="font-size:20px">❤️</span><span style="flex:1;font-size:14px;font-weight:600;color:var(--gray-700)">Mis favoritos</span><span style="color:var(--gray-400)">›</span></div>
+      <div class="profile-menu-item" onclick="showToast('🔒 Configuración de privacidad')"><span style="font-size:20px">🔒</span><span style="flex:1;font-size:14px;font-weight:600;color:var(--gray-700)">Privacidad</span><span style="color:var(--gray-400)">›</span></div>
+      <div class="profile-menu-item" onclick="showToast('👋 Sesión cerrada')"><span style="font-size:20px">🚪</span><span style="flex:1;font-size:14px;font-weight:600;color:var(--gray-700)">Cerrar sesión</span><span style="color:var(--gray-400)">›</span></div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav" id="bottom-nav">
+  <div class="nav-item active" onclick="navigate('explore')"><span class="nav-icon">🏠</span><span class="nav-label">Inicio</span></div>
+  <div class="nav-item" onclick="navigate('explore')"><span class="nav-icon">🔍</span><span class="nav-label">Buscar</span></div>
+  <div class="nav-item" onclick="navigate('ar')"><span class="nav-icon">🥽</span><span class="nav-label">AR</span></div>
+  <div class="nav-item" onclick="navigate('favs')"><span class="nav-icon">❤️</span><span class="nav-label">Favoritos</span></div>
+  <div class="nav-item" onclick="navigate('profile')"><span class="nav-icon">👤</span><span class="nav-label">Perfil</span></div>
+</nav>
+
+<!-- Compare Modal -->
+<div class="modal-overlay" id="compare-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px;margin-bottom:20px;color:var(--gray-800)">⚖️ Comparar propiedades</div>
+    <div id="compare-content"></div>
+    <button class="btn-cta-outline" style="margin-top:16px" onclick="closeCompare()">Cerrar</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+const properties = [
+  {id:1,title:'Apartamento moderno en Chapinero',price:'$380.000.000 COP',tipo:'compra',tipoInmueble:'apartamento',location:'Bogotá, Chapinero',area:72,rooms:3,baths:2,estrato:4,emoji:'🏙️',bgClass:'bg-apt1',desc:'Espectacular apartamento con acabados de lujo en el corazón de Chapinero. Amplios espacios, cocina integral, balcón privado y vista panorámica a la ciudad. Edificio con portería 24 horas y zonas comunes premium.',features:['🚗 Parqueadero','🌿 Balcón privado','🏊 Piscina','🔐 Portería 24h','🏋️ Gimnasio','🎮 Zona social'],ar:true,arRooms:['sala','cocina','habitación principal','baño principal','balcón','zona social']},
+  {id:2,title:'Apartamento familiar en Usaquén',price:'$455.000.000 COP',tipo:'compra',tipoInmueble:'apartamento',location:'Bogotá, Usaquén',area:85,rooms:3,baths:2,estrato:5,emoji:'🌳',bgClass:'bg-apt2',desc:'Hermoso apartamento familiar en Usaquén. Diseño contemporáneo, cocina abierta, habitación principal con walk-in closet. Zona residencial tranquila con excelente valorización.',features:['🚗 2 Parqueaderos','🌿 Terraza privada','🔐 Seguridad 24h','🐾 Pet friendly','🌳 Zona verde','📦 Depósito'],ar:true,arRooms:['sala','comedor','cocina','habitación principal','habitación 2','baño','terraza']},
+  {id:3,title:'Apartaestudio moderno en Teusaquillo',price:'$1.800.000/mes COP',tipo:'arriendo',tipoInmueble:'apartaestudio',location:'Bogotá, Teusaquillo',area:38,rooms:1,baths:1,estrato:4,emoji:'🎨',bgClass:'bg-studio',desc:'Acogedor apartaestudio ideal para profesionales. Diseño funcional con espacio optimizado, cocina americana con electrodomésticos incluidos. A 5 minutos de la Universidad Nacional.',features:['📶 Internet incluido','🛁 Baño privado','🔐 Acceso digital','🚲 Parqueo bici','☕ Cafetería','🚇 Cerca al metro'],ar:false,arRooms:['espacio principal','cocina americana','baño']},
+  {id:4,title:'Casa familiar en Suba',price:'$620.000.000 COP',tipo:'compra',tipoInmueble:'casa',location:'Bogotá, Suba',area:120,rooms:4,baths:3,estrato:4,emoji:'🏡',bgClass:'bg-house',desc:'Amplia casa de dos pisos ideal para familia numerosa. Sala-comedor espacioso, cocina integral, estudio independiente, jardín privado con zona BBQ y cuarto de servicio.',features:['🚗 2 Parqueaderos','🌿 Jardín privado','🔐 Conjunto cerrado','🍖 Zona BBQ','📚 Estudio','👩‍🍳 Cuarto servicio'],ar:true,arRooms:['sala','comedor','cocina','habitación principal','habitación 2','habitación 3','baño','jardín','estudio']},
+  {id:5,title:'Apartamento de lujo en Chicó',price:'$890.000.000 COP',tipo:'compra',tipoInmueble:'apartamento',location:'Bogotá, Chicó',area:110,rooms:3,baths:3,estrato:6,emoji:'💎',bgClass:'bg-modern',desc:'Apartamento de alta gama con vistas privilegiadas en el Chicó. Acabados importados, cocina gourmet, sala-comedor de doble altura y terraza privada. Edificio boutique de 8 apartamentos por piso.',features:['🚗 3 Parqueaderos','🌿 Terraza gourmet','🏊 Jacuzzi','🎪 Salón eventos','🍷 Wine cellar','👔 Concierge'],ar:true,arRooms:['sala de doble altura','cocina gourmet','habitación principal','vestier','baño de lujo','terraza']},
+  {id:6,title:'Apartamento en arriendo en Palermo',price:'$2.800.000/mes COP',tipo:'arriendo',tipoInmueble:'apartamento',location:'Bogotá, Palermo',area:58,rooms:2,baths:2,estrato:4,emoji:'🌇',bgClass:'bg-apt3',desc:'Moderno apartamento en Palermo. Dos habitaciones con closets, sala de TV independiente y cocina tipo buffet. A pasos de restaurantes, cafés y centros culturales.',features:['🚗 Parqueadero','🏋️ Gimnasio','☕ Café comunal','🔐 Portería 24h','🚿 Baño principal','📱 Smart home'],ar:false,arRooms:['sala','cocina','habitación principal','habitación 2','baño']}
+];
+
+// AR rooms data
+const arRoomData = {
+  'sala':         {emoji:'🛋️',bg:'linear-gradient(135deg,#1a1a2e,#16213e)',depL:'🚪',depR:'🪟',hotspots:[{top:'35%',left:'25%',label:'Sala principal',info:{Área:'28 m²',Iluminación:'Natural + LED',Acabados:'Piso madera ingeniería',Ventilación:'Ventana doble vidrio',Vista:'Calle arborizada',Nota:'Espaciosa y luminosa'}},{top:'55%',right:'20%',label:'Ventanas',info:{Tipo:'Doble vidrio térmico',Marco:'Aluminio anodizado',Vista:'Panorámica ciudad',Aislamiento:'Acústico nivel 3',Nota:'Reduce ruido exterior'}}]},
+  'cocina':       {emoji:'🍳',bg:'linear-gradient(135deg,#1e2a1a,#243320)',depL:'🚪',depR:'🪴',hotspots:[{top:'30%',left:'20%',label:'Cocina integral',info:{Área:'12 m²',Tipo:'Cocina abierta',Acabados:'Granito negro',Electrodomésticos:'Línea premium',Ventilación:'Extractor industrial',Nota:'Perfecta para chefs'}},{top:'60%',right:'25%',label:'Mesón',info:{Material:'Cuarzo blanco',Longitud:'3.2 metros lineales',Almacenamiento:'12 gabinetes',Nota:'Amplio espacio de trabajo'}}]},
+  'habitación principal':{emoji:'🛏️',bg:'linear-gradient(135deg,#1a1a2e,#2d1b69)',depL:'🚪',depR:'🪟',hotspots:[{top:'30%',left:'25%',label:'Habitación principal',info:{Área:'18 m²',Closet:'Walk-in 4m²',Iluminación:'LED regulable',Acabados:'Piso laminado',Vista:'Jardín interior',Nota:'Amplia y confortable'}},{top:'60%',right:'20%',label:'Closet principal',info:{Tipo:'Walk-in closet',Área:'4 m²',Módulos:'8 módulos',Iluminación:'Sensores automáticos',Nota:'Diseño italiano'}}]},
+  'habitación 2': {emoji:'🛏️',bg:'linear-gradient(135deg,#1a2235,#243050)',depL:'🚪',depR:'🪟',hotspots:[{top:'35%',left:'20%',label:'Habitación 2',info:{Área:'14 m²',Closet:'Empotrado 2m',Iluminación:'Natural abundante',Acabados:'Pintura ECO',Nota:'Ideal para estudio'}},{top:'58%',right:'25%',label:'Vista exterior',info:{Tipo:'Vista jardines',Altura:'Piso 4',Orientación:'Norte (fresca)',Nota:'Sin edificio enfrente'}}]},
+  'habitación 3': {emoji:'🛏️',bg:'linear-gradient(135deg,#1a2535,#1a2540)',depL:'🚪',depR:'🪟',hotspots:[{top:'35%',left:'25%',label:'Habitación 3',info:{Área:'12 m²',Uso:'Flexible (oficina/cuarto)',Closet:'Empotrado',Acabados:'Recién remodelada',Nota:'Ingreso luz natural'}}]},
+  'baño':         {emoji:'🚿',bg:'linear-gradient(135deg,#1a2a2e,#1a3040)',depL:'🚿',depR:'🪟',hotspots:[{top:'35%',left:'25%',label:'Baño completo',info:{Área:'6 m²',Tipo:'Baño completo',Acabados:'Porcelana italiana',Sanitario:'Marca Toto',Ducha:'Lluvia + hidromasaje',Nota:'Acabados de lujo'}},{top:'58%',right:'20%',label:'Ducha',info:{Tipo:'Ducha lluvia italiana',Presión:'Alta presión',Temperatura:'Control digital',Nota:'Experiencia spa'}}]},
+  'baño principal':{emoji:'🛁',bg:'linear-gradient(135deg,#1a2a2e,#0a2030)',depL:'🛁',depR:'🪟',hotspots:[{top:'35%',left:'20%',label:'Baño de lujo',info:{Área:'9 m²',Tipo:'Suite completa',Tina:'Semiencajada',Ducha:'Vidrio templado',Acabados:'Mármol carrara',Nota:'Diseño premium'}},{top:'55%',right:'25%',label:'Tina de baño',info:{Tipo:'Semiencajada',Material:'Acrílico reforzado',Capacidad:'350 litros',Nota:'Perfecta para relajarse'}}]},
+  'balcón':       {emoji:'🌅',bg:'linear-gradient(135deg,#0d1b4a,#1a2d70)',depL:'🌿',depR:'🌆',hotspots:[{top:'40%',left:'20%',label:'Balcón privado',info:{Área:'8 m²',Vista:'Panorámica ciudad',Orientación:'Occidente',Piso:'Porcelana antideslizante',Baranda:'Vidrio templado',Nota:'Atardeceres únicos'}},{top:'55%',right:'20%',label:'Vista panorámica',info:{Tipo:'Ciudad y montañas',Altura:'Piso 8',Orientación:'360° giro completo',Nota:'Vistas espectaculares'}}]},
+  'terraza':      {emoji:'🌅',bg:'linear-gradient(135deg,#0d1b4a,#1a2d70)',depL:'🌿',depR:'🏙️',hotspots:[{top:'35%',left:'20%',label:'Terraza privada',info:{Área:'20 m²',Vista:'Panorámica total',Acabados:'Deck sintético',Nota:'Espacio gourmet'}}]},
+  'zona social':  {emoji:'🎮',bg:'linear-gradient(135deg,#1a0d2e,#2d1458)',depL:'🏊',depR:'🎾',hotspots:[{top:'35%',left:'25%',label:'Zona social',info:{Área:'150 m²',Piscina:'Temperada',Gimnasio:'Equipado completo',Salón:'Eventos 50 personas',BBQ:'Zona parrilla',Nota:'Amenidades completas'}}]},
+  'comedor':      {emoji:'🍽️',bg:'linear-gradient(135deg,#1e1a0a,#2e2810)',depL:'🚪',depR:'🪟',hotspots:[{top:'35%',left:'25%',label:'Comedor',info:{Área:'15 m²',Capacidad:'8 personas',Mesa:'Importada',Iluminación:'LED colgante',Nota:'Integrado a la sala'}}]},
+  'jardín':       {emoji:'🌳',bg:'linear-gradient(135deg,#0a1e0a,#162e16)',depL:'🌻',depR:'🌺',hotspots:[{top:'35%',left:'20%',label:'Jardín privado',info:{Área:'40 m²',Pasto:'Natural irlandés',Riego:'Automático',Zona:'BBQ incluida',Nota:'Mantenido mensual'}}]},
+  'estudio':      {emoji:'📚',bg:'linear-gradient(135deg,#1a150a,#2e2514)',depL:'📖',depR:'💻',hotspots:[{top:'35%',left:'25%',label:'Estudio',info:{Área:'10 m²',Uso:'Oficina/biblioteca',Iluminación:'Natural + LED',Insonorizado:'Sí',Nota:'Perfecto para trabajar'}}]},
+  'vestier':      {emoji:'👔',bg:'linear-gradient(135deg,#1a1a2e,#1e1535)',depL:'👗',depR:'👠',hotspots:[{top:'35%',left:'20%',label:'Walk-in closet',info:{Área:'6 m²',Módulos:'12 módulos',Iluminación:'Sensores LED',Espejo:'Cuerpo completo',Nota:'Diseño italiano'}}]},
+  'espacio principal':{emoji:'🏠',bg:'linear-gradient(135deg,#1a1a2e,#16213e)',depL:'🚪',depR:'🪟',hotspots:[{top:'35%',left:'25%',label:'Espacio principal',info:{Área:'25 m²',Tipo:'Estudio abierto',Iluminación:'Natural óptima',Multifuncional:'Sí',Nota:'Sala + habitación integrados'}}]},
+  'cocina americana':{emoji:'🍳',bg:'linear-gradient(135deg,#1e2a1a,#243320)',depL:'🚪',depR:'🏠',hotspots:[{top:'35%',left:'25%',label:'Cocina americana',info:{Tipo:'Integrada al espacio',Electrodomésticos:'Incluidos',Acabados:'Melamina blanca',Nota:'Funcional y moderna'}}]},
+  'sala de doble altura':{emoji:'🏛️',bg:'linear-gradient(135deg,#0a0a1e,#141428)',depL:'🚪',depR:'🪟',hotspots:[{top:'25%',left:'20%',label:'Doble altura',info:{Altura:'5.5 metros',Área:'35 m²',Iluminación:'Natural cenital',Acabados:'Importados',Vista:'Espectacular',Nota:'Sensación de amplitud total'}},{top:'60%',right:'15%',label:'Acabados',info:{Piso:'Mármol travertino',Paredes:'Estuco veneciano',Techo:'Molduras en yeso',Nota:'Lujo en cada detalle'}}]},
+  'cocina gourmet':{emoji:'👨‍🍳',bg:'linear-gradient(135deg,#1e2a1a,#0a1a0a)',depL:'🚪',depR:'🍷',hotspots:[{top:'35%',left:'20%',label:'Cocina gourmet',info:{Área:'18 m²',Isla:'Central 2.5m',Marca:'Wolf + SubZero',Acabados:'Granito negro absoluto',Nota:'Para chefs exigentes'}}]},
+  'baño de lujo': {emoji:'🛁',bg:'linear-gradient(135deg,#1a2a2e,#0a2030)',depL:'🛁',depR:'🪟',hotspots:[{top:'35%',left:'20%',label:'Suite de baño',info:{Área:'11 m²',Tina:'Free standing',Ducha:'Italia doble cabeza',Acabados:'Mármol Calacatta',Nota:'Spa privado'}}]},
+  'terraza gourmet':{emoji:'🌆',bg:'linear-gradient(135deg,#050510,#0d0d30)',depL:'🌿',depR:'🏙️',hotspots:[{top:'30%',left:'15%',label:'Terraza gourmet',info:{Área:'25 m²',Vista:'Panorámica 180°',BBQ:'Built-in',Pergola:'Motorizada',Nota:'Entretenimiento premium'}}]}
+};
+
+// Furniture catalog
+const furnitureCatalog = {
+  sofás:      [{name:'Sofá 3p',emoji:'🛋️'},{name:'Sofá L',emoji:'🛋️'},{name:'Poltrona',emoji:'🪑'},{name:'Futón',emoji:'🛋️'}],
+  camas:      [{name:'Cama doble',emoji:'🛏️'},{name:'Cama sencilla',emoji:'🛏️'},{name:'Canapé',emoji:'🛏️'},{name:'Litera',emoji:'🛏️'}],
+  mesas:      [{name:'Mesa comedor',emoji:'🪵'},{name:'Mesa centro',emoji:'🟤'},{name:'Mesa aux.',emoji:'🟫'},{name:'Escritorio',emoji:'🖥️'}],
+  sillas:     [{name:'Silla comedor',emoji:'🪑'},{name:'Silla oficina',emoji:'💺'},{name:'Mecedora',emoji:'🪑'},{name:'Banqueta',emoji:'🟫'}],
+  lámparas:   [{name:'Lámpara piso',emoji:'💡'},{name:'Lámpara techo',emoji:'🔆'},{name:'Velador',emoji:'🕯️'},{name:'Tira LED',emoji:'✨'}],
+  plantas:    [{name:'Planta grande',emoji:'🌿'},{name:'Cactus',emoji:'🌵'},{name:'Flores',emoji:'🌸'},{name:'Árbol ficus',emoji:'🌳'}],
+  cuadros:    [{name:'Cuadro arte',emoji:'🖼️'},{name:'Fotografía',emoji:'📷'},{name:'Espejo',emoji:'🪞'},{name:'Reloj mural',emoji:'🕐'}],
+  alfombras:  [{name:'Alfombra rectangular',emoji:'🟩'},{name:'Alfombra redonda',emoji:'⭕'},{name:'Tapete entrada',emoji:'🟫'},{name:'Corredor',emoji:'🟦'}],
+  'tv/audio': [{name:'Mueble TV',emoji:'📺'},{name:'Rack modular',emoji:'🗄️'},{name:'Parlantes',emoji:'🔊'},{name:'Proyector',emoji:'📽️'}],
+  decoración: [{name:'Jarrón',emoji:'🫙'},{name:'Cojines',emoji:'🟣'},{name:'Manta',emoji:'🧶'},{name:'Canasta',emoji:'🧺'}]
+};
+
+const decorRooms = ['Sala','Cocina','Habitación principal','Habitación 2','Baño','Balcón/Terraza'];
+const wallColors = {'Moderno':'#F0EBE3','Minimalista':'#F5F5F5','Clásico':'#EDE8DC','Industrial':'#D0CCBF','Familiar':'#FDEFD8'};
+const floorColors = {'Moderno':'#C8B89A','Minimalista':'#E0E0E0','Clásico':'#A8885A','Industrial':'#8A8070','Familiar':'#D4A870'};
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+const S = {
+  currentScreen:'home',
+  currentProperty:null,
+  favorites:JSON.parse(localStorage.getItem('vc_favs')||'[]'),
+  placedFurniture:[],
+  selectedItem:null,
+  currentStyle:'Moderno',
+  currentColor:'Blanco',
+  currentCat:'sofás',
+  currentDecorRoom:'Sala',
+  currentARRoom:0,
+  arStep:0,
+  arModeActive:false,
+  gridVisible:false,
+  savedDesigns:JSON.parse(localStorage.getItem('vc_designs')||'[]'),
+  currentFilter:'all'
+};
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+const hideNavScreens=['home','admin','ar','detail','schedule','decor'];
+
+function navigate(screen){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+screen).classList.add('active');
+  S.currentScreen=screen;
+  const nav=document.getElementById('bottom-nav');
+  nav.style.display=hideNavScreens.includes(screen)?'none':'flex';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(screen==='explore')document.querySelectorAll('.nav-item')[0].classList.add('active');
+  if(screen==='favs')document.querySelectorAll('.nav-item')[3].classList.add('active');
+  if(screen==='profile')document.querySelectorAll('.nav-item')[4].classList.add('active');
+  if(screen==='explore')renderProperties();
+  if(screen==='favs')renderFavs();
+  if(screen==='decor'){renderDecorRoomSelector();renderFurnitureCatalog();renderFurnitureGrid();updateDecorCanvas();renderSummary();}
+  if(screen==='ar')initAR();
+}
+
+// ════════════════════════════════════════
+// PROPERTIES
+// ════════════════════════════════════════
+function renderProperties(){
+  const grid=document.getElementById('properties-grid');
+  const f=S.currentFilter;
+  let list=properties.filter(p=>{
+    if(f==='all')return true;
+    if(f==='compra'||f==='arriendo')return p.tipo===f;
+    if(['apartamento','casa','apartaestudio'].includes(f))return p.tipoInmueble===f;
+    if(f==='3+')return p.rooms>=3;
+    return true;
+  });
+  const q=document.getElementById('search-input').value.toLowerCase();
+  if(q)list=list.filter(p=>p.location.toLowerCase().includes(q)||p.title.toLowerCase().includes(q));
+  document.getElementById('results-label').textContent=`${list.length} propiedad${list.length!==1?'es':''} encontrada${list.length!==1?'s':''}`;
+  grid.innerHTML=list.map(p=>`
+    <div class="property-card">
+      <div class="card-img-placeholder ${p.bgClass}" style="position:relative">
+        <span>${p.emoji}</span>
+        <div class="card-badge ${p.tipo==='arriendo'?'arriendo':''}">${p.tipo==='arriendo'?'ARRIENDO':'VENTA'}</div>
+        <button class="card-fav" onclick="quickToggleFav(${p.id},event)">${S.favorites.includes(p.id)?'❤️':'🤍'}</button>
+        ${p.ar?'<div class="card-ar-badge">🥽 AR</div>':''}
+      </div>
+      <div class="card-body">
+        <div class="card-price">${p.price}</div>
+        <div class="card-location">📍 ${p.location}</div>
+        <div class="card-stats"><span class="stat">📐 ${p.area}m²</span><span class="stat">🛏️ ${p.rooms} hab.</span><span class="stat">🚿 ${p.baths} baños</span></div>
+        <div class="card-actions">
+          <button class="btn-detail" onclick="openDetail(${p.id})">Ver detalles</button>
+          <button class="btn-ar-card" onclick="openDetail(${p.id});setTimeout(()=>navigate('ar'),300)">🥽 Ver en AR</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterProperties(){renderProperties();}
+function setFilter(el,f){
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');S.currentFilter=f;renderProperties();
+}
+
+function openDetail(id){
+  S.currentProperty=properties.find(p=>p.id===id);
+  const p=S.currentProperty;
+  const hero=document.getElementById('detail-hero-img');
+  hero.className='detail-hero '+p.bgClass;
+  hero.innerHTML=`<button class="detail-back" onclick="navigate('explore')">←</button><span style="font-size:72px">${p.emoji}</span><div class="gallery-dots"><div class="gallery-dot active"></div><div class="gallery-dot"></div><div class="gallery-dot"></div></div>`;
+  document.getElementById('det-price').textContent=p.price;
+  document.getElementById('det-location').innerHTML='📍 '+p.location;
+  document.getElementById('det-area').textContent=p.area;
+  document.getElementById('det-rooms').textContent=p.rooms;
+  document.getElementById('det-baths').textContent=p.baths;
+  document.getElementById('det-estrato').textContent=p.estrato;
+  document.getElementById('det-desc').textContent=p.desc;
+  const isFav=S.favorites.includes(p.id);
+  document.getElementById('fav-btn-icon').textContent=isFav?'❤️':'♡';
+  document.getElementById('fav-btn-text').textContent=isFav?'Guardado en favoritos':'Guardar en favoritos';
+  document.getElementById('det-features').innerHTML=p.features.map(f=>`<div class="feature-tag"><span style="font-size:16px">${f.split(' ')[0]}</span><span>${f.split(' ').slice(1).join(' ')}</span></div>`).join('');
+  navigate('detail');
+}
+
+// ════════════════════════════════════════
+// FAVORITES
+// ════════════════════════════════════════
+function quickToggleFav(id,ev){ev.stopPropagation();toggleFavById(id);renderProperties();}
+function toggleFav(){if(!S.currentProperty)return;toggleFavById(S.currentProperty.id);const isFav=S.favorites.includes(S.currentProperty.id);document.getElementById('fav-btn-icon').textContent=isFav?'❤️':'♡';document.getElementById('fav-btn-text').textContent=isFav?'Guardado en favoritos':'Guardar en favoritos';}
+function toggleFavById(id){const idx=S.favorites.indexOf(id);if(idx>=0){S.favorites.splice(idx,1);showToast('💔 Eliminado de favoritos');}else{S.favorites.push(id);showToast('❤️ Guardado en favoritos');}localStorage.setItem('vc_favs',JSON.stringify(S.favorites));}
+
+function renderFavs(){
+  const cont=document.getElementById('favs-content');
+  const fp=properties.filter(p=>S.favorites.includes(p.id));
+  if(!fp.length){cont.innerHTML='<div class="empty-state"><div class="empty-icon">🏠</div><div class="empty-title">Sin favoritos aún</div><div class="empty-sub">Explora y guarda las propiedades que más te gusten.</div><button class="btn-detail" style="margin-top:20px;padding:12px 24px;border-radius:12px" onclick="navigate(\'explore\')">Explorar inmuebles</button></div>';return;}
+  cont.innerHTML=fp.map(p=>`<div class="fav-card" onclick="openDetail(${p.id})"><div class="fav-img ${p.bgClass}"><span>${p.emoji}</span></div><div class="fav-info"><div class="fav-price">${p.price}</div><div class="fav-loc">📍 ${p.location}</div><div class="fav-stats"><span class="fav-stat">📐 ${p.area}m²</span><span class="fav-stat">🛏️ ${p.rooms}</span><span class="fav-stat">🚿 ${p.baths}</span></div></div><div class="fav-actions"><button class="btn-rm-fav" onclick="removeFav(${p.id},event)">✕</button>${p.ar?'<span class="ar-indicator">🥽 AR</span>':''}</div></div>`).join('');
+}
+function removeFav(id,ev){ev.stopPropagation();toggleFavById(id);renderFavs();}
+function openCompare(){
+  const fp=properties.filter(p=>S.favorites.includes(p.id));
+  if(fp.length<2){showToast('Necesitas al menos 2 favoritos para comparar');return;}
+  const cols=fp.slice(0,3);
+  const rows=[['Precio',...cols.map(p=>`<small>${p.price}</small>`)],['Área',...cols.map(p=>p.area+'m²')],['Hab.',...cols.map(p=>p.rooms+' 🛏️')],['Baños',...cols.map(p=>p.baths+' 🚿')],['Estrato',...cols.map(p=>p.estrato)],['AR',...cols.map(p=>p.ar?'✅':'❌')]];
+  document.getElementById('compare-content').innerHTML=`<table class="compare-table"><tr><th>Característica</th>${cols.map(p=>`<th>${p.emoji}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map((v,i)=>i===0?`<td style="color:var(--gray-500);font-weight:600">${v}</td>`:`<td>${v}</td>`).join('')}</tr>`).join('')}</table>`;
+  document.getElementById('compare-modal').classList.add('open');
+}
+function closeCompare(){document.getElementById('compare-modal').classList.remove('open');}
+
+
+// ════════════════════════════════════════
+// AR TOUR — STREET VIEW 360 FIX
+// ════════════════════════════════════════
+let arCurrentRooms=[];
+let arStepIdx=0;
+let arYaw=0;
+let arPitch=0;
+let arZoom=1;
+let arDragStart=null;
+let arVisibleHotspots=[];
+let arStreetViewBound=false;
+
+function initAR(){
+  const p=S.currentProperty;
+  if(p){
+    arCurrentRooms=p.arRooms||['sala','cocina','habitación principal','baño'];
+    document.getElementById('ar-prop-name').textContent=p.title;
+    document.getElementById('ar-prop-loc').textContent='📍 '+p.location+' · Estrato '+p.estrato;
+    document.getElementById('ar-prop-area').textContent=p.area+' m²';
+  } else {
+    arCurrentRooms=['sala','cocina','habitación principal','baño','balcón'];
+  }
+  arStepIdx=0;
+  arYaw=0;
+  arPitch=0;
+  arZoom=1;
+  S.arModeActive=false;
+  setupARStreetViewControls();
+  renderARRoomTabs();
+  updateARScene();
+  resetARMode();
+}
+
+function setupARStreetViewControls(){
+  const viewport=document.getElementById('ar-viewport');
+  const scene=document.getElementById('ar-scene');
+  if(!viewport||arStreetViewBound)return;
+  arStreetViewBound=true;
+
+  viewport.addEventListener('pointerdown',e=>{
+    if(e.target.closest('button,.ar-hotspot,.ar-room-tab,.ar-hud-btn,.ar-back-btn,.btn-ar-activate,.btn-ar-decor,.ar-info-panel,.ar-prop-info'))return;
+    arDragStart={x:e.clientX,y:e.clientY,yaw:arYaw,pitch:arPitch};
+    scene.classList.add('dragging');
+    viewport.setPointerCapture?.(e.pointerId);
+  });
+
+  viewport.addEventListener('pointermove',e=>{
+    if(!arDragStart)return;
+    const dx=e.clientX-arDragStart.x;
+    const dy=e.clientY-arDragStart.y;
+    arYaw=normalizeYaw(arDragStart.yaw-dx*.28);
+    arPitch=clamp(arDragStart.pitch+dy*.16,-38,34);
+    updateStreetViewCamera();
+  });
+
+  function endDrag(e){
+    if(!arDragStart)return;
+    arDragStart=null;
+    scene.classList.remove('dragging');
+    try{viewport.releasePointerCapture?.(e.pointerId);}catch(err){}
+  }
+  viewport.addEventListener('pointerup',endDrag);
+  viewport.addEventListener('pointercancel',endDrag);
+  viewport.addEventListener('pointerleave',endDrag);
+
+  viewport.addEventListener('wheel',e=>{
+    if(S.currentScreen!=='ar')return;
+    e.preventDefault();
+    arZoom=clamp(arZoom-(e.deltaY*.001),.92,1.22);
+    updateStreetViewCamera();
+    showZoomChip();
+  },{passive:false});
+}
+
+function renderARRoomTabs(){
+  const scroll=document.getElementById('ar-rooms-scroll');
+  scroll.innerHTML=arCurrentRooms.map((r,i)=>`<div class="ar-room-tab${i===arStepIdx?' active':''}" onclick="jumpToARRoom(${i})">${capitalize(r)}</div>`).join('');
+}
+
+function updateARScene(){
+  const roomName=arCurrentRooms[arStepIdx]||'sala';
+  const rd=arRoomData[roomName]||arRoomData['sala'];
+  const panorama=document.getElementById('sv-panorama');
+  panorama.innerHTML=buildStreetViewPanorama(roomName,rd);
+  document.getElementById('sv-room-pill').textContent=capitalize(roomName);
+  document.querySelectorAll('.ar-room-tab').forEach((t,i)=>t.classList.toggle('active',i===arStepIdx));
+  renderHotspots(rd.hotspots||[]);
+  closeInfoPanel();
+  updateStreetViewCamera();
+}
+
+
+function buildStreetViewPanorama(roomName,rd){
+  const palette=getRoomPalette(roomName);
+  const family=getRoomFamily(roomName);
+  const panels=getPanoramaPanels(roomName, family);
+  return `<div class="sv-track" id="sv-track">${panels.map((panel,idx)=>buildStreetViewPanel(panel,palette,family,idx)).join('')}</div>`;
+}
+
+function buildStreetViewPanel(panel,palette,family,idx){
+  const roomSlug=slugifyRoomName(roomNameToCss(panel.room||family));
+  return `<section class="sv-panel sv-real room-${roomSlug}" style="--sv-wall:${palette.wall};--sv-wall2:${palette.wall2};--sv-floor:${palette.floor};--sv-floor2:${palette.floor2};--sv-accent:${palette.accent};">
+    <div class="sv-wall">
+      <div class="sv-backlight"></div>
+      <div class="sv-room-depth"></div>
+      ${buildWallArchitecture(panel,family)}
+      ${panel.wallObjects.map(o=>buildSVObject(o,'wall-object')).join('')}
+      ${panel.floorObjects.map(o=>buildSVObject(o,'floor-object')).join('')}
+      <div class="sv-baseboard"></div>
+      <div class="sv-label-wall">${panel.label}</div>
+    </div>
+    <div class="sv-depth-lines"></div>
+    <div class="sv-floor"><div class="sv-rug sv-rug-real"></div></div>
+  </section>`;
+}
+
+function roomNameToCss(name){
+  return String(name||'sala').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ñ/g,'n').replace(/Ñ/g,'N').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+}
+function slugifyRoomName(name){ return roomNameToCss(name); }
+
+function getRoomFamily(roomName){
+  const name=String(roomName||'').toLowerCase();
+  if(name.includes('cocina')) return 'cocina';
+  if(name.includes('baño')||name.includes('bano')) return 'bano';
+  if(name.includes('habitación')||name.includes('habitacion')||name.includes('vestier')) return 'habitacion';
+  if(name.includes('balcón')||name.includes('balcon')||name.includes('terraza')||name.includes('jardín')||name.includes('jardin')) return 'balcon';
+  if(name.includes('estudio')) return 'estudio';
+  if(name.includes('social')) return 'social';
+  if(name.includes('comedor')) return 'comedor';
+  return 'sala';
+}
+
+function buildSVObject(obj, extraClass=''){
+  const classes=['sv-built', obj.className, extraClass].filter(Boolean).join(' ');
+  const styleParts=[];
+  if(obj.x!=null) styleParts.push(`--x:${typeof obj.x==='number'?obj.x+'%':obj.x}`);
+  if(obj.b!=null) styleParts.push(`--b:${typeof obj.b==='number'?obj.b+'%':obj.b}`);
+  if(obj.w) styleParts.push(`--w:${typeof obj.w==='number'?obj.w+'px':obj.w}`);
+  if(obj.h) styleParts.push(`--h:${typeof obj.h==='number'?obj.h+'px':obj.h}`);
+  if(obj.s) styleParts.push(`--s:${obj.s}`);
+  if(obj.z) styleParts.push(`--z:${obj.z}`);
+  return `<div class="${classes}" style="${styleParts.join(';')}">${buildSVInner(obj.type||obj.className)}<div class="sv-shadow"></div></div>`;
+}
+
+function buildSVInner(type){
+  switch(type){
+    case 'sofa': return '<div class="back"></div><div class="seat"></div><div class="arm l"></div><div class="arm r"></div><div class="leg l"></div><div class="leg r"></div>';
+    case 'coffee': return '<div class="top"></div><div class="leg l"></div><div class="leg r"></div>';
+    case 'tv': return '<span class="screen"></span><div class="console"></div>';
+    case 'plant': return '<div class="leaf a"></div><div class="leaf b"></div><div class="leaf c"></div><div class="pot"></div>';
+    case 'lamp': return '<div class="shade"></div><div class="pole"></div><div class="base"></div>';
+    case 'kitchen-set': return '<div class="upper"></div><div class="backsplash"></div><div class="base"></div>';
+    case 'island': return '<div class="top"></div><div class="base"></div>';
+    case 'dining': return '<div class="table"></div><div class="chair c1"></div><div class="chair c2"></div><div class="chair c3"></div>';
+    case 'pendant': return '';
+    case 'bed': return '<div class="head"></div><div class="mattress"></div><div class="blanket"></div><div class="pillow"></div>';
+    case 'vanity': return '<div class="mirror"></div><div class="counter"></div><div class="base"></div><div class="sink"></div>';
+    case 'desk': return '<div class="monitor"></div><div class="top"></div><div class="leg l"></div><div class="leg r"></div>';
+    default: return '';
+  }
+}
+
+function buildWallArchitecture(panel,family){
+  const els=[];
+  if(panel.window==='wide') els.push(`<div class="sv-built sv-window-real sv-window-wide wall-object" style="--x:${panel.windowX||74}% ;--b:42%;--z:7"></div>`);
+  else if(panel.window) els.push(`<div class="sv-built sv-window-real wall-object" style="--x:${panel.windowX||78}% ;--b:43%;--z:7"></div>`);
+  if(panel.door) els.push(`<div class="sv-built sv-door-real wall-object" style="--x:${panel.doorX||14}% ;--b:37%;--z:7"></div>`);
+  if(panel.art) els.push(`<div class="sv-built sv-wall-art wall-object" style="--x:${panel.artX||22}% ;--b:58%;--z:7"></div>`);
+  if(family==='balcon'){
+    els.push('<div class="sv-built sv-skyline wall-object" style="--x:50%;--b:39%;--z:5"></div>');
+    els.push('<div class="sv-built sv-rail wall-object" style="--x:50%;--b:34%;--z:8"></div>');
+  }
+  return els.join('');
+}
+
+function getPanoramaPanels(roomName, family){
+  const room=roomName;
+  const base={room};
+  const defs={
+    sala:[
+      {label:'Frente',window:'wide',art:true,windowX:77,artX:18,floorObjects:[
+        {type:'sofa',className:'sv-sofa',x:50,b:38,w:188,h:82,z:10},
+        {type:'coffee',className:'sv-coffee-table',x:50,b:32,w:118,h:48,z:11},
+        {type:'plant',className:'sv-plant',x:16,b:38,w:58,h:82,z:9},
+        {type:'lamp',className:'sv-lamp',x:82,b:38,w:54,h:104,z:9}
+      ],wallObjects:[]},
+      {label:'Derecha',door:true,window:true,doorX:16,windowX:80,floorObjects:[
+        {type:'tv',className:'sv-tv',x:54,b:38,w:128,h:80,z:10},
+        {type:'plant',className:'sv-plant',x:82,b:38,w:58,h:82,z:9}
+      ],wallObjects:[{type:'generic',className:'sv-bookshelf',x:24,b:37,w:92,h:132,z:10}]},
+      {label:'Fondo',door:true,art:true,doorX:22,artX:78,floorObjects:[
+        {type:'generic',className:'sv-bookshelf',x:72,b:37,w:92,h:132,z:10},
+        {type:'plant',className:'sv-plant',x:47,b:38,w:58,h:82,z:9}
+      ],wallObjects:[]},
+      {label:'Izquierda',window:true,art:true,windowX:23,artX:78,floorObjects:[
+        {type:'generic',className:'sv-dining',x:52,b:33,w:174,h:90,z:10},
+        {type:'generic',className:'sv-pendant',x:52,b:57,w:110,h:105,z:8},
+        {type:'plant',className:'sv-plant',x:16,b:38,w:58,h:82,z:9}
+      ],wallObjects:[]}
+    ],
+    comedor:[
+      {label:'Frente',window:'wide',floorObjects:[{type:'generic',className:'sv-dining',x:50,b:33,w:174,h:90,z:10},{type:'generic',className:'sv-pendant',x:50,b:57,w:110,h:105,z:8}],wallObjects:[]},
+      {label:'Derecha',door:true,floorObjects:[{type:'generic',className:'sv-sideboard',x:52,b:37,w:120,h:72,z:10}],wallObjects:[{type:'generic',className:'sv-wall-art',x:78,b:56,w:92,h:62,z:8}]},
+      {label:'Fondo',window:true,floorObjects:[{type:'plant',className:'sv-plant',x:24,b:38,w:58,h:82,z:9},{type:'generic',className:'sv-dining',x:66,b:33,w:144,h:80,z:10}],wallObjects:[]},
+      {label:'Izquierda',art:true,floorObjects:[{type:'generic',className:'sv-kitchen-set',x:54,b:37,w:200,h:126,z:10}],wallObjects:[]}
+    ],
+    cocina:[
+      {label:'Frente',window:true,windowX:84,floorObjects:[{type:'kitchen-set',className:'sv-kitchen-set',x:50,b:37,w:250,h:145,z:10},{type:'generic',className:'sv-stool',x:28,b:33,w:32,h:54,z:11},{type:'generic',className:'sv-stool',x:72,b:33,w:32,h:54,z:11}],wallObjects:[]},
+      {label:'Derecha',door:true,doorX:13,art:true,artX:76,floorObjects:[{type:'generic',className:'sv-fridge',x:24,b:37,w:68,h:132,z:10},{type:'island',className:'sv-island',x:60,b:33,w:160,h:74,z:10},{type:'generic',className:'sv-stool',x:79,b:33,w:32,h:54,z:11}],wallObjects:[]},
+      {label:'Fondo',window:true,windowX:20,floorObjects:[{type:'generic',className:'sv-shelf',x:76,b:53,w:120,h:74,z:8},{type:'kitchen-set',className:'sv-kitchen-set',x:44,b:37,w:200,h:130,z:10}],wallObjects:[]},
+      {label:'Izquierda',door:true,doorX:78,window:true,windowX:20,floorObjects:[{type:'generic',className:'sv-dining',x:52,b:33,w:152,h:84,z:10}],wallObjects:[]}
+    ],
+    habitacion:[
+      {label:'Frente',window:'wide',windowX:80,floorObjects:[{type:'bed',className:'sv-bed',x:50,b:33,w:194,h:104,z:10},{type:'generic',className:'sv-nightstand',x:20,b:35,w:44,h:52,z:9},{type:'generic',className:'sv-nightstand',x:80,b:35,w:44,h:52,z:9}],wallObjects:[]},
+      {label:'Derecha',door:true,doorX:14,art:true,artX:78,floorObjects:[{type:'generic',className:'sv-wardrobe',x:30,b:37,w:112,h:142,z:10},{type:'generic',className:'sv-mirror',x:76,b:37,w:56,h:116,z:10}],wallObjects:[]},
+      {label:'Fondo',window:true,windowX:24,floorObjects:[{type:'generic',className:'sv-dresser',x:52,b:37,w:104,h:72,z:10},{type:'plant',className:'sv-plant',x:84,b:38,w:58,h:82,z:9}],wallObjects:[]},
+      {label:'Izquierda',door:true,doorX:78,floorObjects:[{type:'generic',className:'sv-desk',x:48,b:33,w:148,h:90,z:10},{type:'generic',className:'sv-chair-office',x:65,b:33,w:58,h:76,z:11}],wallObjects:[{type:'generic',className:'sv-wall-art',x:22,b:56,w:92,h:62,z:8}]}
+    ],
+    bano:[
+      {label:'Frente',window:true,windowX:82,floorObjects:[{type:'vanity',className:'sv-vanity',x:42,b:36,w:134,h:116,z:10},{type:'generic',className:'sv-toilet',x:76,b:35,w:82,h:82,z:10}],wallObjects:[{type:'generic',className:'sv-towel',x:18,b:49,w:62,h:54,z:8}]},
+      {label:'Derecha',door:true,doorX:14,floorObjects:[{type:'generic',className:'sv-shower',x:58,b:36,w:104,h:158,z:10},{type:'generic',className:'sv-plant',x:82,b:36,w:50,h:72,z:8}],wallObjects:[]},
+      {label:'Fondo',window:true,windowX:22,art:true,artX:76,floorObjects:[{type:'generic',className:'sv-tub',x:50,b:34,w:162,h:74,z:10}],wallObjects:[{type:'generic',className:'sv-towel',x:82,b:49,w:62,h:54,z:8}]},
+      {label:'Izquierda',door:true,doorX:78,floorObjects:[{type:'generic',className:'sv-vanity',x:34,b:36,w:110,h:98,z:10},{type:'generic',className:'sv-shower',x:74,b:36,w:90,h:145,z:10}],wallObjects:[]}
+    ],
+    balcon:[
+      {label:'Vista principal',window:false,floorObjects:[{type:'generic',className:'sv-outdoor-set',x:50,b:31,w:164,h:88,z:10},{type:'plant',className:'sv-plant',x:16,b:36,w:58,h:82,z:9},{type:'plant',className:'sv-plant',x:84,b:36,w:58,h:82,z:9}],wallObjects:[]},
+      {label:'Derecha',window:false,floorObjects:[{type:'generic',className:'sv-lounger',x:52,b:31,w:168,h:84,z:10},{type:'generic',className:'sv-planter-box',x:82,b:31,w:90,h:46,z:9}],wallObjects:[]},
+      {label:'Fondo',window:false,floorObjects:[{type:'generic',className:'sv-bbq',x:28,b:31,w:88,h:82,z:10},{type:'generic',className:'sv-outdoor-set',x:68,b:31,w:140,h:80,z:10}],wallObjects:[]},
+      {label:'Izquierda',window:false,floorObjects:[{type:'generic',className:'sv-planter-box',x:24,b:31,w:90,h:46,z:9},{type:'generic',className:'sv-outdoor-set',x:62,b:31,w:140,h:80,z:10}],wallObjects:[]}
+    ],
+    estudio:[
+      {label:'Frente',window:'wide',floorObjects:[{type:'desk',className:'sv-desk',x:50,b:33,w:148,h:90,z:10},{type:'generic',className:'sv-chair-office',x:66,b:33,w:58,h:76,z:11},{type:'generic',className:'sv-bookshelf',x:18,b:37,w:92,h:132,z:9}],wallObjects:[]},
+      {label:'Derecha',door:true,floorObjects:[{type:'generic',className:'sv-bookshelf',x:28,b:37,w:92,h:132,z:10},{type:'plant',className:'sv-plant',x:76,b:38,w:58,h:82,z:9}],wallObjects:[{type:'generic',className:'sv-wall-art',x:78,b:58,w:92,h:62,z:8}]},
+      {label:'Fondo',window:true,windowX:20,floorObjects:[{type:'generic',className:'sv-sofa',x:56,b:38,w:150,h:72,z:10},{type:'generic',className:'sv-coffee-table',x:56,b:32,w:100,h:42,z:11}],wallObjects:[]},
+      {label:'Izquierda',door:true,doorX:78,floorObjects:[{type:'generic',className:'sv-desk',x:44,b:33,w:140,h:84,z:10},{type:'generic',className:'sv-chair-office',x:32,b:33,w:58,h:76,z:11}],wallObjects:[]}
+    ],
+    social:[
+      {label:'Frente',window:'wide',floorObjects:[{type:'generic',className:'sv-pool',x:50,b:30,w:202,h:88,z:10}],wallObjects:[]},
+      {label:'Derecha',door:true,floorObjects:[{type:'generic',className:'sv-gym',x:50,b:31,w:118,h:82,z:10},{type:'plant',className:'sv-plant',x:82,b:38,w:58,h:82,z:9}],wallObjects:[]},
+      {label:'Fondo',window:true,floorObjects:[{type:'generic',className:'sv-bbq',x:36,b:31,w:88,h:82,z:10},{type:'generic',className:'sv-dining',x:70,b:31,w:140,h:82,z:10}],wallObjects:[]},
+      {label:'Izquierda',door:true,doorX:78,floorObjects:[{type:'generic',className:'sv-desk',x:46,b:33,w:140,h:84,z:10},{type:'generic',className:'sv-chair-office',x:62,b:33,w:58,h:76,z:11}],wallObjects:[]}
+    ]
+  };
+  const chosen=(defs[family]||defs.sala).map(p=>Object.assign({},base,p));
+  return chosen;
+}
+function getRoomPalette(roomName){
+  const name=roomName.toLowerCase();
+  if(name.includes('cocina'))return {wall:'#eef6ef',wall2:'#dcebdd',floor:'#c9b08b',floor2:'#91724c',accent:'#22C55E'};
+  if(name.includes('baño'))return {wall:'#e7f3fb',wall2:'#d1e7f4',floor:'#a9becb',floor2:'#708999',accent:'#38bdf8'};
+  if(name.includes('habitación')||name.includes('vestier'))return {wall:'#f1edf8',wall2:'#dfd7ec',floor:'#b89978',floor2:'#836044',accent:'#8b5cf6'};
+  if(name.includes('balcón')||name.includes('terraza')||name.includes('jardín'))return {wall:'#e4f7f1',wall2:'#c9eadb',floor:'#b4a17c',floor2:'#76694d',accent:'#22C55E'};
+  if(name.includes('social'))return {wall:'#ede9fe',wall2:'#dcd4fb',floor:'#aa8fbd',floor2:'#705485',accent:'#7c3aed'};
+  return {wall:'#e8eef7',wall2:'#d8e2ef',floor:'#c5ab83',floor2:'#8c6f4f',accent:'#1E5FD4'};
+}
+
+function getSideEmoji(roomName,n){
+  const name=roomName.toLowerCase();
+  const sets={
+    cocina:['🧊','🍽️','☕'],
+    baño:['🪞','🧴','🚿'],
+    balcón:['🌆','🪴','☀️'],
+    terraza:['🌆','🪴','☀️'],
+    jardín:['🌳','🌺','🍖'],
+    estudio:['💻','📚','🪑'],
+    vestier:['👗','🪞','👞'],
+    social:['🏊','🎮','🏋️']
+  };
+  const key=Object.keys(sets).find(k=>name.includes(k));
+  const arr=key?sets[key]:['🛋️','🪟','🪴'];
+  return arr[(n-1)%arr.length];
+}
+
+function updateStreetViewCamera(){
+  const track=document.getElementById('sv-track');
+  if(track){
+    const translate=(arYaw/360)*75;
+    track.style.transform=`translate3d(-${translate}%, ${arPitch}px, 0) scale(${arZoom})`;
+  }
+  document.querySelectorAll('.sv-wall').forEach(w=>w.style.setProperty('--sv-pitch',`${arPitch}px`));
+  document.querySelectorAll('.sv-floor').forEach(f=>f.style.setProperty('--sv-pitch',`${arPitch}px`));
+  updateARHUD();
+  refreshHotspotProjection();
+}
+
+function updateARHUD(){
+  const roomName=arCurrentRooms[arStepIdx]||'sala';
+  document.getElementById('ar-compass').textContent=`${getCompassDir(arYaw)} · ${capitalize(roomName)} · Cámara ${Math.round(arYaw)}°`;
+  document.getElementById('ar-step-counter').textContent=`Espacio ${arStepIdx+1} de ${arCurrentRooms.length} · Arrastra para mirar alrededor`;
+}
+
+function renderHotspots(hotspots){
+  const cont=document.getElementById('ar-hotspots-container');
+  const infoHotspots=hotspots.map((h,i)=>({
+    ...h,
+    type:'info',
+    index:i,
+    angle:typeof h.angle==='number'?h.angle:(35+i*95)%360,
+    pitch:typeof h.pitch==='number'?h.pitch:(i%2===0?-2:8)
+  }));
+  const portals=[];
+  if(arStepIdx<arCurrentRooms.length-1){
+    portals.push({type:'portal',dir:'next-room',label:`Avanzar a ${capitalize(arCurrentRooms[arStepIdx+1])}`,angle:0,pitch:12,icon:'➜'});
+  }
+  if(arStepIdx>0){
+    portals.push({type:'portal',dir:'prev-room',label:`Volver a ${capitalize(arCurrentRooms[arStepIdx-1])}`,angle:180,pitch:12,icon:'↩'});
+  }
+  arVisibleHotspots=[...infoHotspots,...portals];
+  cont.innerHTML=arVisibleHotspots.map((h,i)=>{
+    const cls=h.type==='portal'?'sv-portal':'sv-info-hotspot';
+    const click=h.type==='portal'?`arMove('${h.dir}')`:`openHotspot(${h.index})`;
+    const icon=h.type==='portal'?h.icon:'i';
+    return `<div class="ar-hotspot ${cls}" id="ar-hotspot-${i}" onclick="${click}"><div class="hs-circle">${icon}</div><div class="hs-label">${escapeHTML(h.label)}</div></div>`;
+  }).join('');
+  refreshHotspotProjection();
+}
+
+function refreshHotspotProjection(){
+  arVisibleHotspots.forEach((h,i)=>{
+    const el=document.getElementById(`ar-hotspot-${i}`);
+    if(!el)return;
+    const pos=projectYawToScreen(h.angle,h.pitch||0);
+    el.style.left=pos.left+'%';
+    el.style.top=pos.top+'%';
+    el.style.transform=`translate(-50%,-50%) scale(${pos.scale})`;
+    el.classList.toggle('sv-hidden',!pos.visible);
+  });
+}
+
+function projectYawToScreen(angle,pitch){
+  let diff=((angle-arYaw+540)%360)-180;
+  const visible=Math.abs(diff)<=108;
+  const left=50+(diff/108)*46;
+  const top=53+((pitch-arPitch)/52)*35;
+  const scale=clamp(1-Math.abs(diff)/210,.62,1.08);
+  return {visible,left:clamp(left,4,96),top:clamp(top,20,78),scale};
+}
+
+function openHotspot(i){
+  const roomName=arCurrentRooms[arStepIdx]||'sala';
+  const rd=arRoomData[roomName]||arRoomData['sala'];
+  const h=(rd.hotspots||[])[i];
+  if(!h)return;
+  const panel=document.getElementById('ar-info-panel');
+  document.getElementById('ar-info-title').textContent=h.label;
+  document.getElementById('ar-info-grid').innerHTML=Object.entries(h.info).map(([k,v])=>`<div class="ar-info-item"><div class="ai-label">${escapeHTML(k)}</div><div class="ai-val">${escapeHTML(String(v))}</div></div>`).join('');
+  panel.style.display='block';
+  requestAnimationFrame(()=>panel.classList.add('open'));
+}
+function closeInfoPanel(){
+  const p=document.getElementById('ar-info-panel');
+  p.classList.remove('open');
+  setTimeout(()=>{if(!p.classList.contains('open'))p.style.display='none';},400);
+}
+
+function arMove(dir){
+  const flash=document.getElementById('ar-move-flash');
+  flash.classList.add('flash');
+  setTimeout(()=>flash.classList.remove('flash'),150);
+
+  if(dir==='left'){
+    arYaw=normalizeYaw(arYaw-42);
+    updateStreetViewCamera();
+    return;
+  }
+  if(dir==='right'){
+    arYaw=normalizeYaw(arYaw+42);
+    updateStreetViewCamera();
+    return;
+  }
+  if(dir==='forward'||dir==='next-room'){
+    if(arStepIdx>=arCurrentRooms.length-1){showToast('🏁 Ya estás en el último espacio del recorrido');return;}
+    walkToARRoom(arStepIdx+1,'🚶 Avanzando a '+capitalize(arCurrentRooms[arStepIdx+1]));
+    return;
+  }
+  if(dir==='back'||dir==='prev-room'){
+    if(arStepIdx<=0){showToast('↩️ Ya estás en el primer espacio del recorrido');return;}
+    walkToARRoom(arStepIdx-1,'↩️ Volviendo a '+capitalize(arCurrentRooms[arStepIdx-1]));
+  }
+}
+
+function walkToARRoom(idx,msg){
+  showToast(msg);
+  const scene=document.getElementById('ar-scene');
+  scene.style.transition='transform .24s ease, filter .24s ease';
+  scene.style.transform='scale(1.035)';
+  scene.style.filter='brightness(1.15)';
+  setTimeout(()=>{
+    arStepIdx=clamp(idx,0,arCurrentRooms.length-1);
+    S.currentARRoom=arStepIdx;
+    arYaw=0;
+    arPitch=0;
+    arZoom=1;
+    updateARScene();
+    setTimeout(()=>{scene.style.transform='';scene.style.filter='';},80);
+  },180);
+}
+
+function jumpToARRoom(idx){
+  walkToARRoom(idx,'📍 Cambiando a '+capitalize(arCurrentRooms[idx]||'espacio'));
+}
+
+function toggleARMode(){
+  S.arModeActive=!S.arModeActive;
+  const lines=document.getElementById('ar-scan-lines');
+  const badge=document.getElementById('ar-mode-badge');
+  const txt=document.getElementById('ar-mode-text');
+  const btn=document.getElementById('btn-ar-mode');
+  const corners=document.querySelectorAll('.ar-corner');
+  if(S.arModeActive){
+    lines.classList.add('active');corners.forEach(c=>c.classList.add('active'));
+    badge.className='ar-mode-badge ar-active';
+    txt.textContent='AR 360 ACTIVO';btn.textContent='📴 Desactivar AR 360';
+    btn.style.background='linear-gradient(135deg,#166534,#15803d)';
+    showToast('🥽 Modo AR 360 activado');
+  } else resetARMode();
+}
+function resetARMode(){
+  document.getElementById('ar-scan-lines').classList.remove('active');
+  document.getElementById('ar-grid').classList.remove('active');
+  document.querySelectorAll('.ar-corner').forEach(c=>c.classList.remove('active'));
+  document.getElementById('ar-mode-badge').className='ar-mode-badge';
+  document.getElementById('ar-mode-text').textContent='STREET VIEW';
+  document.getElementById('btn-ar-mode').textContent='🥽 Activar modo AR 360';
+  document.getElementById('btn-ar-mode').style.background='linear-gradient(135deg,var(--blue-brand),#7C3AED)';
+}
+function toggleGrid(){
+  S.gridVisible=!S.gridVisible;
+  document.getElementById('ar-grid').classList.toggle('active',S.gridVisible);
+  showToast(S.gridVisible?'📐 Cuadrícula AR activada':'📐 Cuadrícula desactivada');
+}
+
+function showZoomChip(){
+  let chip=document.getElementById('sv-zoom-chip');
+  if(!chip){
+    chip=document.createElement('div');
+    chip.id='sv-zoom-chip';
+    chip.className='sv-zoom-chip';
+    document.getElementById('ar-viewport').appendChild(chip);
+  }
+  chip.textContent=`Zoom ${Math.round(arZoom*100)}%`;
+  chip.style.opacity='1';
+  clearTimeout(chip._hide);
+  chip._hide=setTimeout(()=>chip.style.opacity='0',900);
+}
+
+function normalizeYaw(v){return ((v%360)+360)%360;}
+function clamp(v,min,max){return Math.min(max,Math.max(min,v));}
+function getCompassDir(yaw){const dirs=['N ↑','NE ↗','E →','SE ↘','S ↓','SO ↙','O ←','NO ↖'];return dirs[Math.round(normalizeYaw(yaw)/45)%8];}
+function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+function escapeHTML(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+
+// ════════════════════════════════════════
+// DECORATION — ENHANCED
+// ════════════════════════════════════════
+function renderDecorRoomSelector(){
+  const sel=document.getElementById('decor-room-selector');
+  sel.innerHTML=decorRooms.map(r=>`<div class="drs-tab${r===S.currentDecorRoom?' active':''}" onclick="setDecorRoom(this,'${r}')">${r}</div>`).join('');
+}
+
+function setDecorRoom(el,room){
+  document.querySelectorAll('.drs-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  S.currentDecorRoom=room;
+  S.placedFurniture=[];
+  S.selectedItem=null;
+  renderPlacedFurniture();
+  updateDecorCanvas();
+  renderSummary();
+  showToast('🏠 '+room+' seleccionada');
+}
+
+function updateDecorCanvas(){
+  const wall=document.getElementById('dc-wall');
+  const floor=document.getElementById('dc-floor');
+  wall.style.background=wallColors[S.currentStyle]||'#F0EBE3';
+  floor.style.background=`linear-gradient(180deg,${floorColors[S.currentStyle]||'#C8B89A'} 0%,${darken(floorColors[S.currentStyle]||'#C8B89A',20)} 100%)`;
+}
+
+function darken(hex,pct){const n=parseInt(hex.replace('#',''),16);const r=Math.max(0,((n>>16)&255)-pct);const g=Math.max(0,((n>>8)&255)-pct);const b=Math.max(0,(n&255)-pct);return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');}
+
+function renderFurnitureCatalog(){
+  const scroll=document.getElementById('cat-scroll');
+  scroll.innerHTML=Object.keys(furnitureCatalog).map(cat=>`<div class="cat-pill${cat===S.currentCat?' active':''}" onclick="setCat(this,'${cat}')">${getCatEmoji(cat)} ${cat.charAt(0).toUpperCase()+cat.slice(1)}</div>`).join('');
+}
+
+function getCatEmoji(cat){const m={'sofás':'🛋️','camas':'🛏️','mesas':'🪵','sillas':'🪑','lámparas':'💡','plantas':'🌿','cuadros':'🖼️','alfombras':'🟩','tv/audio':'📺','decoración':'🎨'};return m[cat]||'🏠';}
+
+function setCat(el,cat){
+  document.querySelectorAll('.cat-pill').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');S.currentCat=cat;renderFurnitureGrid();
+}
+
+function renderFurnitureGrid(){
+  const items=furnitureCatalog[S.currentCat]||[];
+  document.getElementById('furniture-grid').innerHTML=items.map(f=>`
+    <div class="fc-card" onclick="addFurniture('${f.emoji}','${f.name}')">
+      <span class="fc-emoji">${f.emoji}</span>
+      <div class="fc-name">${f.name}</div>
+      <div class="fc-add">+ Agregar</div>
+    </div>`).join('');
+}
+
+function addFurniture(emoji,name){
+  if(S.placedFurniture.length>=8){showToast('Espacio lleno — elimina un mueble primero');return;}
+  const id=Date.now();
+  S.placedFurniture.push({id,emoji,name,color:S.currentColor,style:S.currentStyle,room:S.currentDecorRoom});
+  renderPlacedFurniture();
+  renderSummary();
+  showToast('✅ '+name+' agregado');
+}
+
+function renderPlacedFurniture(){
+  const cont=document.getElementById('placed-furniture');
+  cont.innerHTML=S.placedFurniture.map(f=>`
+    <div class="dc-item${S.selectedItem===f.id?' selected':''}" id="dcitem-${f.id}" onclick="selectItem(${f.id},event)">
+      <div class="dc-item-controls">
+        <button class="dc-ctrl-btn" onclick="changeItemColor(${f.id},event)" title="Cambiar color">🎨</button>
+        <button class="dc-ctrl-btn" onclick="duplicateItem(${f.id},event)" title="Duplicar">📋</button>
+        <button class="dc-ctrl-btn" onclick="removeItem(${f.id},event)" title="Eliminar">🗑️</button>
+      </div>
+      <span class="dc-item-emoji" style="font-size:${getEmojiSize(f.name)}px">${f.emoji}</span>
+      <div class="dc-item-shadow"></div>
+    </div>`).join('');
+}
+
+function getEmojiSize(name){
+  const large=['Sofá 3p','Sofá L','Mesa comedor','Cama doble','Canapé','Litera'];
+  const small=['Velador','Tira LED','Flores','Jarrón','Cojines'];
+  if(large.includes(name))return 36;
+  if(small.includes(name))return 20;
+  return 28;
+}
+
+function selectItem(id,ev){ev.stopPropagation();S.selectedItem=S.selectedItem===id?null:id;renderPlacedFurniture();}
+function deselectItem(){S.selectedItem=null;renderPlacedFurniture();}
+
+function changeItemColor(id,ev){
+  ev.stopPropagation();
+  const colors=['Blanco','Madera','Azul noche','Verde bosque','Gris carbón','Vino tinto','Dorado'];
+  const f=S.placedFurniture.find(x=>x.id===id);
+  if(f){const idx=colors.indexOf(f.color);f.color=colors[(idx+1)%colors.length];showToast('🎨 Color: '+f.color);renderSummary();}
+}
+
+function duplicateItem(id,ev){ev.stopPropagation();const f=S.placedFurniture.find(x=>x.id===id);if(f&&S.placedFurniture.length<8){S.placedFurniture.push({...f,id:Date.now()});renderPlacedFurniture();renderSummary();showToast('📋 '+f.name+' duplicado');}}
+
+function removeItem(id,ev){ev.stopPropagation();S.placedFurniture=S.placedFurniture.filter(f=>f.id!==id);if(S.selectedItem===id)S.selectedItem=null;renderPlacedFurniture();renderSummary();showToast('🗑️ Mueble eliminado');}
+
+function clearAll(){S.placedFurniture=[];S.selectedItem=null;renderPlacedFurniture();renderSummary();showToast('🗑️ Espacio limpiado');}
+
+function setStyle(el,style){
+  document.querySelectorAll('.style-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');S.currentStyle=style;updateDecorCanvas();renderSummary();showToast('🎨 Estilo '+style+' aplicado');
+}
+
+function setColor(el,color){
+  document.querySelectorAll('.cs-swatch').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');S.currentColor=color;renderSummary();showToast('🎨 Color base: '+color);
+}
+
+function renderSummary(){
+  const el=document.getElementById('design-summary');
+  if(!S.placedFurniture.length){el.style.display='none';return;}
+  el.style.display='block';
+  document.getElementById('ds-room').textContent=S.currentDecorRoom;
+  document.getElementById('ds-style').textContent=S.currentStyle;
+  document.getElementById('ds-color').textContent=S.currentColor;
+  document.getElementById('ds-count').textContent=S.placedFurniture.length+' elemento'+(S.placedFurniture.length!==1?'s':'');
+  document.getElementById('ds-items').innerHTML=S.placedFurniture.map(f=>`<span class="ds-tag">${f.emoji} ${f.name}</span>`).join('');
+}
+
+function saveDesign(){
+  if(!S.placedFurniture.length){showToast('Agrega muebles antes de guardar');return;}
+  const design={id:Date.now(),style:S.currentStyle,color:S.currentColor,room:S.currentDecorRoom,furniture:[...S.placedFurniture],property:S.currentProperty?.title||'Espacio libre',date:new Date().toLocaleDateString('es-CO')};
+  S.savedDesigns.push(design);
+  localStorage.setItem('vc_designs',JSON.stringify(S.savedDesigns));
+  showToast('💾 Diseño guardado exitosamente');
+}
+
+// ════════════════════════════════════════
+// SCHEDULE
+// ════════════════════════════════════════
+function selectVisitType(el){document.querySelectorAll('.visit-type').forEach(t=>t.classList.remove('active'));el.classList.add('active');}
+function confirmVisit(){
+  const name=document.getElementById('sch-name').value;
+  const email=document.getElementById('sch-email').value;
+  const date=document.getElementById('sch-date').value;
+  if(!name||!email||!date){showToast('Por favor completa todos los campos');return;}
+  document.getElementById('confirm-msg').classList.add('show');
+  showToast('📅 ¡Visita confirmada!');
+  setTimeout(()=>document.getElementById('confirm-msg').scrollIntoView({behavior:'smooth'}),300);
+}
+
+// ════════════════════════════════════════
+// ADMIN
+// ════════════════════════════════════════
+function renderAdminProps(){
+  document.getElementById('admin-props-list').innerHTML=properties.slice(0,4).map((p,i)=>`
+    <div class="admin-prop-row">
+      <div class="admin-prop-img ${p.bgClass}"><span>${p.emoji}</span></div>
+      <div style="flex:1"><div class="admin-prop-title">${p.title}</div><div class="admin-prop-price">${p.price}</div></div>
+      <span class="admin-prop-status ${i%3===2?'status-pending':'status-active'}">${i%3===2?'Pendiente':'Activo'}</span>
+    </div>`).join('');
+}
+function toggleAddForm(){document.getElementById('add-prop-form').classList.toggle('open');}
+function publishProperty(){document.getElementById('add-prop-form').classList.remove('open');showToast('🏠 Propiedad publicada exitosamente');}
+
+// ════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+
+
+// ════════════════════════════════════════
+// AR TOUR — V4 VISUALES INTEGRADOS POR HABITACIÓN
+// ════════════════════════════════════════
+function buildStreetViewPanorama(roomName,rd){
+  const profile=getRoomVisualProfile(roomName);
+  const panels=profile.panels;
+  return `<div class="sv-track" id="sv-track">${panels.map(panel=>buildStreetViewPanel(panel,profile)).join('')}</div>`;
+}
+
+function buildStreetViewPanel(panel,profile){
+  const p=profile.palette;
+  const roomClass='room-'+profile.type;
+  const objects=(panel.objects||[]).map(renderSVObject).join('');
+  const outdoorSky=(profile.outdoor?renderSVObject({type:'skyline',x:50,b:56,s:1,z:2,wall:true}):'');
+  return `<section class="sv-panel sv-real ${roomClass}" data-room="${profile.type}" style="--sv-wall:${p.wall};--sv-wall2:${p.wall2};--sv-floor:${p.floor};--sv-floor2:${p.floor2};--sv-accent:${p.accent};">
+    <div class="sv-wall"></div>
+    <div class="sv-floor"></div>
+    <div class="sv-room-depth"></div>
+    <div class="sv-baseboard"></div>
+    ${outdoorSky}
+    ${objects}
+    <div class="sv-label-wall">${escapeHTML(panel.label)}</div>
+  </section>`;
+}
+
+function renderSVObject(o){
+  const cls=['sv-built','sv-'+o.type];
+  if(o.wall)cls.push('wall-object');
+  if(o.floor)cls.push('floor-object');
+  const style=`--x:${o.x??50}%;--b:${o.b??38}%;--s:${o.s??1};--z:${o.z??8};${o.w?`--w:${o.w};`:''}${o.h?`--h:${o.h};`:''}`;
+  return `<div class="${cls.join(' ')}" style="${style}" aria-hidden="true">${getSVObjectParts(o.type)}<div class="sv-shadow"></div></div>`;
+}
+
+function getSVObjectParts(type){
+  const parts={
+    'sofa':'<div class="back"></div><div class="seat"></div><div class="arm l"></div><div class="arm r"></div><div class="leg l"></div><div class="leg r"></div>',
+    'coffee-table':'<div class="top"></div><div class="leg l"></div><div class="leg r"></div>',
+    'tv':'<div class="screen"></div><div class="console"></div>',
+    'plant':'<div class="leaf a"></div><div class="leaf b"></div><div class="leaf c"></div><div class="pot"></div>',
+    'lamp':'<div class="shade"></div><div class="pole"></div><div class="base"></div>',
+    'kitchen-set':'<div class="upper"></div><div class="backsplash"></div><div class="base"></div>',
+    'island':'<div class="top"></div><div class="base"></div>',
+    'dining':'<div class="chair c1"></div><div class="chair c2"></div><div class="chair c3"></div><div class="table"></div>',
+    'pendant':'',
+    'bed':'<div class="head"></div><div class="mattress"></div><div class="blanket"></div><div class="pillow"></div>',
+    'vanity':'<div class="mirror"></div><div class="counter"></div><div class="base"></div><div class="sink"></div>',
+    'outdoor-set':'<div class="chair c1"></div><div class="chair c2"></div><div class="table"></div>',
+    'desk':'<div class="monitor"></div><div class="top"></div><div class="leg l"></div><div class="leg r"></div>',
+  };
+  return parts[type]||'';
+}
+
+function getRoomVisualProfile(roomName){
+  const raw=roomName.toLowerCase();
+  const type=getVisualType(raw);
+  const palette=getRoomPalette(roomName);
+  const commonWindow={type:'window-real',x:72,b:52,s:.95,z:5,wall:true};
+  const commonDoor={type:'door-real',x:24,b:38,s:.95,z:5,wall:true};
+  const art={type:'wall-art',x:25,b:55,s:.95,z:5,wall:true};
+  const plantR={type:'plant',x:83,b:36,s:.82,z:9};
+  const plantL={type:'plant',x:16,b:36,s:.75,z:9};
+
+  if(type==='cocina')return {type,palette,panels:[
+    {label:'Cocina integral',objects:[{type:'kitchen-set',x:50,b:37,s:1,z:7},commonWindow]},
+    {label:'Zona de almacenamiento',objects:[{type:'fridge',x:30,b:37,s:.92,z:8},{type:'shelf',x:67,b:52,s:1,z:6,wall:true}]},
+    {label:'Isla y barra',objects:[{type:'island',x:50,b:35,s:1,z:9},{type:'stool',x:28,b:34,s:.9,z:8},{type:'stool',x:72,b:34,s:.9,z:8},{type:'pendant',x:50,b:66,s:.9,z:7,wall:true}]},
+    {label:'Salida de cocina',objects:[commonDoor,{type:'kitchen-set',x:68,b:37,s:.82,z:7}]}
+  ]};
+
+  if(type==='bano'||type==='bano-principal'||type==='bano-de-lujo')return {type,palette,panels:[
+    {label:type==='bano'?'Baño completo':'Baño principal',objects:[{type:'vanity',x:50,b:37,s:1,z:8},{type:'towel',x:82,b:53,s:.92,z:6,wall:true}]},
+    {label:'Ducha',objects:[{type:'shower',x:50,b:37,s:1,z:8},{type:'plant',x:18,b:36,s:.55,z:8}]},
+    {label:'Sanitario',objects:[{type:'toilet',x:52,b:37,s:1,z:8},commonWindow]},
+    {label:type==='bano'?'Zona húmeda':'Tina y acabados',objects:[{type:'tub',x:50,b:36,s:1,z:8},{type:'shelf',x:78,b:54,s:.72,z:6,wall:true}]}
+  ]};
+
+  if(type==='habitacion'||type==='habitacion-principal')return {type,palette,panels:[
+    {label:type==='habitacion-principal'?'Habitación principal':'Habitación',objects:[{type:'bed',x:50,b:36,s:1,z:8},{type:'nightstand',x:19,b:36,s:.82,z:8},{type:'nightstand',x:81,b:36,s:.82,z:8}]},
+    {label:'Closet y espejo',objects:[{type:'wardrobe',x:40,b:37,s:1,z:8},{type:'mirror',x:72,b:42,s:.9,z:7,wall:true}]},
+    {label:'Vista e iluminación',objects:[commonWindow,{type:'dresser',x:45,b:37,s:.92,z:8},plantR]},
+    {label:'Acceso a habitación',objects:[commonDoor,{type:'wall-art',x:66,b:56,s:1,z:6,wall:true}]}
+  ]};
+
+  if(type==='comedor')return {type,palette,panels:[
+    {label:'Comedor principal',objects:[{type:'dining',x:50,b:36,s:1,z:8},{type:'pendant',x:50,b:66,s:1,z:6,wall:true}]},
+    {label:'Ventanal',objects:[commonWindow,plantL,{type:'dining',x:48,b:35,s:.75,z:8}]},
+    {label:'Conexión con sala',objects:[commonDoor,{type:'wall-art',x:66,b:56,s:1,z:6,wall:true}]},
+    {label:'Aparador',objects:[{type:'dresser',x:50,b:37,s:1,z:8},{type:'wall-art',x:50,b:56,s:.9,z:6,wall:true}]}
+  ]};
+
+  if(type==='balcon'||type==='terraza'||type==='jardin')return {type,palette,outdoor:true,panels:[
+    {label:type==='jardin'?'Jardín privado':'Vista exterior',objects:[{type:'rail',x:50,b:38,s:1,z:6,wall:true},{type:'outdoor-set',x:50,b:34,s:1,z:9},plantL,plantR]},
+    {label:'Zona de descanso',objects:[{type:'outdoor-set',x:45,b:34,s:1,z:9},{type:'plant',x:78,b:35,s:1,z:8}]},
+    {label:type==='jardin'?'Zona BBQ':'Baranda y seguridad',objects:[{type:'rail',x:50,b:38,s:1,z:6,wall:true},{type:'bbq',x:70,b:35,s:.9,z:8},plantL]},
+    {label:'Ambiente exterior',objects:[{type:'outdoor-set',x:58,b:34,s:.9,z:9},{type:'plant',x:27,b:35,s:1,z:8}]}
+  ]};
+
+  if(type==='estudio')return {type,palette,panels:[
+    {label:'Zona de trabajo',objects:[{type:'desk',x:50,b:36,s:1,z:8},{type:'chair-office',x:50,b:34,s:.85,z:9},commonWindow]},
+    {label:'Biblioteca',objects:[{type:'bookshelf',x:34,b:37,s:1,z:8},{type:'bookshelf',x:66,b:37,s:.92,z:8}]},
+    {label:'Acceso',objects:[commonDoor,{type:'plant',x:75,b:36,s:.78,z:8}]},
+    {label:'Lectura',objects:[{type:'lamp',x:23,b:37,s:.92,z:9},{type:'sofa',x:61,b:35,s:.65,z:8}]}
+  ]};
+
+  if(type==='vestier')return {type,palette,panels:[
+    {label:'Walk-in closet',objects:[{type:'wardrobe',x:33,b:37,s:1,z:8},{type:'wardrobe',x:68,b:37,s:1,z:8}]},
+    {label:'Espejo completo',objects:[{type:'mirror',x:50,b:42,s:1.1,z:7,wall:true},{type:'dresser',x:50,b:37,s:.85,z:8}]},
+    {label:'Módulos',objects:[{type:'bookshelf',x:31,b:37,s:.92,z:8},{type:'wardrobe',x:68,b:37,s:.95,z:8}]},
+    {label:'Acceso',objects:[commonDoor,{type:'mirror',x:70,b:43,s:.82,z:7,wall:true}]}
+  ]};
+
+  if(type==='zona-social')return {type,palette,panels:[
+    {label:'Piscina social',objects:[{type:'pool',x:50,b:34,s:1,z:8},plantL,plantR]},
+    {label:'Gimnasio',objects:[{type:'gym',x:50,b:36,s:1,z:8},{type:'window-real',x:76,b:53,s:.85,z:5,wall:true}]},
+    {label:'Salón comunal',objects:[{type:'sofa',x:46,b:35,s:.85,z:8},{type:'coffee-table',x:50,b:34,s:.8,z:9},{type:'wall-art',x:50,b:56,s:1,z:5,wall:true}]},
+    {label:'Acceso zonas comunes',objects:[commonDoor,{type:'plant',x:76,b:36,s:.85,z:8}]}
+  ]};
+
+  return {type:'sala',palette,panels:[
+    {label:'Sala principal',objects:[{type:'window-real',x:68,b:53,s:1,z:5,wall:true},{type:'sofa',x:50,b:36,s:1,z:8},{type:'coffee-table',x:50,b:32,s:1,z:9},plantR]},
+    {label:'Muro multimedia',objects:[{type:'tv',x:50,b:49,s:1,z:7,wall:true},{type:'coffee-table',x:50,b:31,s:.82,z:8},plantL]},
+    {label:'Ingreso',objects:[commonDoor,{type:'wall-art',x:64,b:56,s:1,z:6,wall:true},{type:'plant',x:78,b:36,s:.8,z:8}]},
+    {label:'Biblioteca y descanso',objects:[{type:'bookshelf',x:26,b:37,s:.9,z:8},{type:'sofa',x:64,b:35,s:.7,z:8},{type:'lamp',x:85,b:37,s:.78,z:9}]}
+  ]};
+}
+
+function getVisualType(raw){
+  if(raw.includes('cocina'))return 'cocina';
+  if(raw.includes('baño de lujo'))return 'bano-de-lujo';
+  if(raw.includes('baño principal')||raw.includes('baño'))return raw.includes('principal')?'bano-principal':'bano';
+  if(raw.includes('habitación principal')||raw.includes('principal'))return 'habitacion-principal';
+  if(raw.includes('habitación')||raw.includes('espacio principal'))return 'habitacion';
+  if(raw.includes('comedor'))return 'comedor';
+  if(raw.includes('balcón')||raw.includes('balcon'))return 'balcon';
+  if(raw.includes('terraza'))return 'terraza';
+  if(raw.includes('jardín')||raw.includes('jardin'))return 'jardin';
+  if(raw.includes('estudio'))return 'estudio';
+  if(raw.includes('vestier'))return 'vestier';
+  if(raw.includes('social'))return 'zona-social';
+  return 'sala';
+}
+
+function getRoomPalette(roomName){
+  const type=getVisualType(roomName.toLowerCase());
+  const palettes={
+    sala:{wall:'#e8eef7',wall2:'#d9e4f2',floor:'#c5ab83',floor2:'#8c6f4f',accent:'#1E5FD4'},
+    cocina:{wall:'#effaf1',wall2:'#dcebdd',floor:'#c8aa7d',floor2:'#89663e',accent:'#22C55E'},
+    'bano':{wall:'#e5f6ff',wall2:'#d1e7f4',floor:'#b7cad4',floor2:'#6f8998',accent:'#38bdf8'},
+    'bano-principal':{wall:'#e5f6ff',wall2:'#cbe5f5',floor:'#b3c7d4',floor2:'#667f8e',accent:'#38bdf8'},
+    'bano-de-lujo':{wall:'#f4fbff',wall2:'#dbeafe',floor:'#d6d3d1',floor2:'#78716c',accent:'#a3e635'},
+    habitacion:{wall:'#f4effd',wall2:'#dfd7ec',floor:'#b89978',floor2:'#836044',accent:'#8b5cf6'},
+    'habitacion-principal':{wall:'#f7edff',wall2:'#dfd1f2',floor:'#bd936f',floor2:'#7c563c',accent:'#8b5cf6'},
+    comedor:{wall:'#fff6e8',wall2:'#ead7bd',floor:'#bc9868',floor2:'#765236',accent:'#f59e0b'},
+    balcon:{wall:'#dbeafe',wall2:'#bfdbfe',floor:'#b4a17c',floor2:'#76694d',accent:'#22C55E'},
+    terraza:{wall:'#dbeafe',wall2:'#bfdbfe',floor:'#b4a17c',floor2:'#76694d',accent:'#22C55E'},
+    jardin:{wall:'#dcfce7',wall2:'#bbf7d0',floor:'#8fb565',floor2:'#526b33',accent:'#16a34a'},
+    estudio:{wall:'#f6ead9',wall2:'#dfc5a5',floor:'#b8895f',floor2:'#775033',accent:'#0f766e'},
+    vestier:{wall:'#f3f0f7',wall2:'#ddd6e7',floor:'#b89978',floor2:'#836044',accent:'#a855f7'},
+    'zona-social':{wall:'#ede9fe',wall2:'#d8b4fe',floor:'#b6a0d6',floor2:'#6d4a96',accent:'#7c3aed'}
+  };
+  return palettes[type]||palettes.sala;
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  renderProperties();
+  renderAdminProps();
+  renderFurnitureCatalog();
+  renderFurnitureGrid();
+  renderDecorRoomSelector();
+  const d=new Date();d.setDate(d.getDate()+3);
+  const di=document.getElementById('sch-date');if(di)di.value=d.toISOString().split('T')[0];
+  const ti=document.getElementById('sch-time');if(ti)ti.value='10:00';
+});
+</script>
+</body>
+</html>
